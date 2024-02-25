@@ -8,7 +8,7 @@
 
 ## Description
 
-
+![Dark Tower board and pieces](/media/img/tabletop.jpg)
 
 The 1981 Board Game _Dark Tower_ by Milton Bradley was an electronic fantasy that fueled my adventurous childhood. Apparently, I'm not alone, as there's quite a lot of nostalgia for this game, even though its beeps and whirrs are wincingly archaic compared to modern electronic games.
 
