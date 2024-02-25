@@ -28,7 +28,7 @@ main > button {
     border-radius: 100em;
     background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
     color: gainsboro;
-    font-size: 2em;
+    font-size: max(calc(min(100%, 100vh)), 2em);
     font-weight: bold;
     text-transform: uppercase;
 }
