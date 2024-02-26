@@ -44,8 +44,13 @@ const media = await loadMedia([
     { type: "image", name: "warrior", path: "./media/img/warrior.jpg" },
     { type: "image", name: "warriors", path: "./media/img/warriors.jpg" },
     { type: "image", name: "wizard", path: "./media/img/wizard.jpg" },
-]);
+], init);
 
-setTimeout(() => {
-    console.log(media);
-}, 3000);
+function init() {
+    const playButton = document.querySelector("header button");
+    playButton.textContent = "Play";
+    playButton.removeAttribute("disabled");
+    playButton.addEventListener("click", () => {
+        console.log(media);
+    });
+}
