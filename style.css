@@ -19,7 +19,7 @@ img {
     display: block;
 }
 
-main > button {
+header button {
     display: block;
     width: 90%;
     margin: auto;
@@ -31,4 +31,12 @@ main > button {
     font-size: max(calc(min(100%, 100vh)), 2em);
     font-weight: bold;
     text-transform: uppercase;
+}
+
+button {
+    cursor: pointer;
+}
+
+.intro header ~ * {
+    display: none;
 }
