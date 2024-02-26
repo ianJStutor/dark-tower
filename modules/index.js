@@ -52,5 +52,14 @@ function init() {
     playButton.removeAttribute("disabled");
     playButton.addEventListener("click", () => {
         console.log(media);
-    });
+        setup();
+    }, { once: true });
+}
+
+function setup() {
+    media.audio.intro.addEventListener("ended", () => {
+        media.audio.whirrbeep.play();
+    }, { once: true });
+    media.audio.intro.play();
+
 }
