@@ -61,5 +61,4 @@ function setup() {
         media.audio.whirrbeep.play();
     }, { once: true });
     media.audio.intro.play();
-
 }
