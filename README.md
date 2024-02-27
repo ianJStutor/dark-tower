@@ -18,6 +18,24 @@ My old game, once loved and played weekly, is now dirty and with a partially col
 
 Built with vanilla JavaScript, my favorite flavor!
 
+## Gameplay
+
+### One app shared by all players
+
+This simulates the original game in which there was one user interface to be used by all players. One player turned the Tower and interacted with it, and then ended the turn and waited for play to come around again. Here, the app is launched--perhaps on one mobile device--and that app is passed from one player to the next. If it's not your turn, you wait just as you would for the original game.
+
+Any number of players may join the game, but see below for the single-player version.
+
+* Winning the Wizard as treasure after a successful battle allows the player to curse any of the other players, transferring warriors and gold. This is the only true interaction among players.
+
+### One app for each player (or single player)
+
+In this version, each player (including a single player) has an open copy of the app. This enables all players to take a turn simultaneously and only wait until all players have ended the turn.
+
+Any number of players may play the game in this way.
+
+* Winning the Wizard as treasure after a successful battle acts as protection from a random Cursed event, much as the Healer protects from Plague. There is no true interaction among players.
+
 ## Author
 
 > [Ian Marshall](https://ianjstutor.github.io/ian-marshall/)
