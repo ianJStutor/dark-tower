@@ -50,15 +50,17 @@ function init() {
     const playButton = document.querySelector("header button");
     playButton.textContent = "Play";
     playButton.removeAttribute("disabled");
-    playButton.addEventListener("click", () => {
-        console.log(media);
-        setup();
-    }, { once: true });
+    playButton.addEventListener("click", setup, { once: true });
 }
 
 function setup() {
+    document.body.className = "introSetup1";
     media.audio.intro.addEventListener("ended", () => {
+        document.body.className = "introSetup2";
         media.audio.whirrbeep.play();
+        setTimeout(() => {
+            document.body.className = "getPlayers";
+        }, 2000);
     }, { once: true });
     media.audio.intro.play();
 }

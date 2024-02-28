@@ -6,11 +6,13 @@ body {
 
 main {
     background: black;
+    max-height: 100vh;
     max-height: 100dvh;
-    max-width: 100dvw;
+    max-width: 100%;
     aspect-ratio: 1 / 2;
     margin: auto;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 img {
@@ -37,6 +39,42 @@ button {
     cursor: pointer;
 }
 
+/*
+    GAME STATES
+*/
+
 .intro header ~ * {
     display: none;
+}
+
+.introSetup1 header ~ * {
+    display: none;
+}
+
+.introSetup1 header button {
+    transition: 0.25s;
+    transform: scale(0);
+}
+
+.introSetup1 header img {
+    transition: 5s;
+    transform: scale(1.25);
+}
+
+.introSetup2 header ~ * {
+    display: none;
+}
+
+.introSetup2 header button {
+    display: none;
+}
+
+.introSetup2 header img:first-of-type {
+    transition: 2s;
+    transform: scale(1.25) translateY(-200%);
+}
+
+.introSetup2 header img:last-of-type {
+    transition: 2s;
+    transform: scale(1.25) translateY(200%);
 }
