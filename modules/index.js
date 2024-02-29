@@ -47,6 +47,8 @@ window.media = await loadMedia([
 ], () => loadScreen("splash"));
 
 window.loadScreen = (id) => {
+    document.body.className = "";
+    const main = document.querySelector("main");
     const template = document.getElementById(id).content.cloneNode(true);
     main.replaceChildren(template);
 };

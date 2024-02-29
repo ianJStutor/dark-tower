@@ -81,12 +81,86 @@
     </template>
 
     <template id="getPlayers">
+        <style>
+            h2 {
+                translate: 0 -200%;
+            }
+            h2 ~ * {
+                translate: 0 100vh;
+            }
+            ul {
+                padding: 0;
+                list-style-type: none;
+                max-height: 60vh;
+                overflow-y: auto;
+            }
+            input {
+                display: block;
+                width: 90%;
+                margin: 1em auto;
+                padding: 0.5em;
+                border-radius: 0.5em;
+            }
+            button {
+                display: block;
+                margin: 1em auto;
+                padding: 1em;
+                border: none;
+                border-radius: 100vw;
+                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
+                color: gainsboro;
+            }
+            button[disabled] {
+                background: dimgray;
+                color: #555;
+            }
+            button:first-of-type {
+                width: 50%;
+            }
+            button:last-of-type {
+                width: 90%;
+                font-size: max(calc(min(100%, 100vh)), 2em);
+                font-weight: bold;
+                text-transform: uppercase;
+                position: absolute;
+                bottom: 0;
+                left: 5%;
+            }
+            .in h2 {
+                animation: slidein 2s forwards;
+            }
+            .in h2 ~ * {
+                animation: slidein 1s forwards;
+            }
+            @keyframes slidein {
+                to { translate: 0 0; }
+            }
+        </style>
         <h2>Players</h2>
         <ul>
             <li><input placeholder="player 1 name"></li>
         </ul>
         <button>Add player</button>
-        <button>Start!</button>
+        <button disabled>Start!</button>
+        <script>
+            document.body.className = "in";
+            const [addPlayer, start] = document.querySelectorAll("button");
+            const ul = document.querySelector("ul");
+            const firstPlayer = document.querySelector("input");
+            setTimeout(() => { firstPlayer.focus(); }, 1000);
+            firstPlayer.addEventListener("input", () => {
+                if (firstPlayer.value) start.removeAttribute("disabled");
+                else start.setAttribute("disabled", true);
+            });
+            addPlayer.addEventListener("click", () => {
+                media.audio.click.play();
+                const nextNum = ul.childElementCount + 1;
+                const li = document.createElement("li");
+                li.innerHTML = `<input placeholder="player ${nextNum} name">`;
+                ul.append(li);
+                ul.querySelector("li:last-of-type input").focus();
+            });
+        </script>
     </template>
 </body>
 </html>
