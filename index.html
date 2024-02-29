@@ -160,7 +160,19 @@
                 ul.append(li);
                 ul.querySelector("li:last-of-type input").focus();
             });
+            start.addEventListener("click", () => {
+                const playerNames = [...document.querySelectorAll("input")].map(i => i.value);
+                if (!playerNames.length) {
+                    media.audio.player_hit.play();
+                    return;
+                }
+                media.audio.end_turn.play();
+                loadScreen("getFirstPlayer");
+            }, { once: true });
         </script>
+    </template>
+    <template id="getFirstPlayer">
+        <h2>Get first player</h2>
     </template>
 </body>
 </html>
