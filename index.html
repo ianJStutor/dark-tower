@@ -25,7 +25,10 @@
     <script type="module" src="modules/index.js"></script>
 </head>
 <body>
-    <main></main>
+    <main>
+        <img src="media/img/logo-inverse.jpg">
+        <h2>Loading...</h2>
+    </main>
 
     <template id="splash">
         <style>
@@ -60,8 +63,21 @@
             }
         </style>
         <img src="media/img/Dark-Tower-Cover.jpg" alt="Dark Tower box cover">
-        <button disabled>Loading...</button>
+        <button>Play</button>
         <img src="media/img/player-gradient.png" alt="Player silhouette">
+        <script>
+            document.querySelector("button").addEventListener("click", () => {
+                document.body.className = "out";
+                media.audio.intro.addEventListener("ended", () => {
+                    document.body.classList.add("out2");
+                    media.audio.whirrbeep.play();
+                    setTimeout(() => {
+                        loadScreen("getPlayers");
+                    }, 1000);
+                }, { once: true });
+                media.audio.intro.play();
+            }, { once: true });
+        </script>
     </template>
 
     <template id="getPlayers">

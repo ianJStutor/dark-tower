@@ -1,6 +1,6 @@
 import loadMedia from "./media.js";
 
-const media = await loadMedia([
+window.media = await loadMedia([
     { type: "audio", name: "battle", path: "./media/audio/battle.wav" },
     { type: "audio", name: "bazaar_closed", path: "./media/audio/bazaar-closed.wav" },
     { type: "audio", name: "bazaar", path: "./media/audio/bazaar.wav" },
@@ -44,34 +44,9 @@ const media = await loadMedia([
     { type: "image", name: "warrior", path: "./media/img/warrior.jpg" },
     { type: "image", name: "warriors", path: "./media/img/warriors.jpg" },
     { type: "image", name: "wizard", path: "./media/img/wizard.jpg" },
-], init);
-const main = document.querySelector("main");
+], () => loadScreen("splash"));
 
-function loadScreen(id) {
+window.loadScreen = (id) => {
     const template = document.getElementById(id).content.cloneNode(true);
     main.replaceChildren(template);
-}
-
-function init() {
-    const playButton = document.querySelector("button");
-    playButton.textContent = "Play";
-    playButton.removeAttribute("disabled");
-    playButton.addEventListener("click", setup, { once: true });
-}
-
-function setup() {
-    main.className = "out";
-    media.audio.intro.addEventListener("ended", () => {
-        main.classList.add("out2");
-        media.audio.whirrbeep.play();
-        setTimeout(() => {
-            loadScreen("getPlayers");
-        }, 1000);
-    }, { once: true });
-    media.audio.intro.play();
-}
-
-/**
- * on page load
- */
-loadScreen("splash");
+};
