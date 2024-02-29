@@ -1,6 +1,7 @@
 import loadMedia from "./media.js";
+import darkTowerGame from "./darkTowerGame.js";
 
-window.media = await loadMedia([
+darkTowerGame.media = await loadMedia([
     { type: "audio", name: "battle", path: "./media/audio/battle.wav" },
     { type: "audio", name: "bazaar_closed", path: "./media/audio/bazaar-closed.wav" },
     { type: "audio", name: "bazaar", path: "./media/audio/bazaar.wav" },
@@ -44,11 +45,13 @@ window.media = await loadMedia([
     { type: "image", name: "warrior", path: "./media/img/warrior.jpg" },
     { type: "image", name: "warriors", path: "./media/img/warriors.jpg" },
     { type: "image", name: "wizard", path: "./media/img/wizard.jpg" },
-], () => loadScreen("splash"));
+], () => darkTowerGame.loadScreen("splash"));
 
-window.loadScreen = (id) => {
+darkTowerGame.loadScreen = (id) => {
     document.body.className = "";
     const main = document.querySelector("main");
     const template = document.getElementById(id).content.cloneNode(true);
     main.replaceChildren(template);
 };
+
+window.dt = darkTowerGame;
