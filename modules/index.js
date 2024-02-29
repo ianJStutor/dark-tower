@@ -47,7 +47,7 @@ const media = await loadMedia([
 ], init);
 const main = document.querySelector("main");
 
-function loadTemplate(id) {
+function loadScreen(id) {
     const template = document.getElementById(id).content.cloneNode(true);
     main.replaceChildren(template);
 }
@@ -65,8 +65,8 @@ function setup() {
         main.classList.add("out2");
         media.audio.whirrbeep.play();
         setTimeout(() => {
-            loadTemplate("getPlayers");
-        }, 2000);
+            loadScreen("getPlayers");
+        }, 1000);
     }, { once: true });
     media.audio.intro.play();
 }
@@ -74,4 +74,4 @@ function setup() {
 /**
  * on page load
  */
-loadTemplate("splash");
+loadScreen("splash");

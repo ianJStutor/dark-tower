@@ -24,21 +24,8 @@
     <link rel="stylesheet" href="style.css">
     <script type="module" src="modules/index.js"></script>
 </head>
-<body class="intro">
-    <main>
-        <!-- <header>
-            
-        </header> -->
-        <!-- <figure>
-            <figcaption></figcaption>
-        </figure>
-        <menu>
-
-        </menu>
-        <footer>
-            <img src="media/img/logo-inverse.jpg" alt="Dark Tower logo">
-        </footer> -->
-    </main>
+<body>
+    <main></main>
 
     <template id="splash">
         <style>
@@ -55,6 +42,22 @@
                 font-weight: bold;
                 text-transform: uppercase;
             }
+            .out button {
+                transition: 0.25s;
+                transform: scale(0);
+            }
+            .out img {
+                transition: scale 5s;
+                scale: 1.25;
+            }
+            .out2 img:first-of-type {
+                transition: translate 1s;
+                translate: 0 -200%;
+            }
+            .out2 img:last-of-type {
+                transition: translate 1s;
+                translate: 0 200%;
+            }
         </style>
         <img src="media/img/Dark-Tower-Cover.jpg" alt="Dark Tower box cover">
         <button disabled>Loading...</button>
@@ -62,7 +65,12 @@
     </template>
 
     <template id="getPlayers">
-        <h2>Get Players</h2>
+        <h2>Players</h2>
+        <ul>
+            <li><input placeholder="player 1 name"></li>
+        </ul>
+        <button>Add player</button>
+        <button>Start!</button>
     </template>
 </body>
 </html>
