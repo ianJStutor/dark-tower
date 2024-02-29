@@ -26,12 +26,10 @@
 </head>
 <body class="intro">
     <main>
-        <header>
-            <img src="media/img/Dark-Tower-Cover.jpg" alt="Dark Tower box cover">
-            <button disabled>Loading...</button>
-            <img src="media/img/player-gradient.png" alt="Player silhouette">
-        </header>
-        <figure>
+        <!-- <header>
+            
+        </header> -->
+        <!-- <figure>
             <figcaption></figcaption>
         </figure>
         <menu>
@@ -39,7 +37,32 @@
         </menu>
         <footer>
             <img src="media/img/logo-inverse.jpg" alt="Dark Tower logo">
-        </footer>
+        </footer> -->
     </main>
+
+    <template id="splash">
+        <style>
+            button {
+                display: block;
+                width: 90%;
+                margin: auto;
+                padding: 1em;
+                border: none;
+                border-radius: 100em;
+                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
+                color: gainsboro;
+                font-size: max(calc(min(100%, 100vh)), 2em);
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+        </style>
+        <img src="media/img/Dark-Tower-Cover.jpg" alt="Dark Tower box cover">
+        <button disabled>Loading...</button>
+        <img src="media/img/player-gradient.png" alt="Player silhouette">
+    </template>
+
+    <template id="getPlayers">
+        <h2>Get Players</h2>
+    </template>
 </body>
 </html>

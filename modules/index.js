@@ -45,22 +45,33 @@ const media = await loadMedia([
     { type: "image", name: "warriors", path: "./media/img/warriors.jpg" },
     { type: "image", name: "wizard", path: "./media/img/wizard.jpg" },
 ], init);
+const main = document.querySelector("main");
+
+function loadTemplate(id) {
+    const template = document.getElementById(id).content.cloneNode(true);
+    main.replaceChildren(template);
+}
 
 function init() {
-    const playButton = document.querySelector("header button");
+    const playButton = document.querySelector("button");
     playButton.textContent = "Play";
     playButton.removeAttribute("disabled");
     playButton.addEventListener("click", setup, { once: true });
 }
 
 function setup() {
-    document.body.className = "introSetup1";
+    main.className = "out";
     media.audio.intro.addEventListener("ended", () => {
-        document.body.className = "introSetup2";
+        main.classList.add("out2");
         media.audio.whirrbeep.play();
         setTimeout(() => {
-            document.body.className = "getPlayers";
+            loadTemplate("getPlayers");
         }, 2000);
     }, { once: true });
     media.audio.intro.play();
 }
+
+/**
+ * on page load
+ */
+loadTemplate("splash");
