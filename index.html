@@ -176,7 +176,37 @@
         <h2>Who plays first?</h2>
     </template>
     <template id="singlePlayerNotes">
-        <h2>Changes for single players</h2>
+        <style>
+            ul {
+                color: gainsboro;
+            }
+            li {
+                margin: 1em;
+                font-size: larger;
+            }
+            button {
+                padding: 1em;
+                border: none;
+                border-radius: 100vw;
+                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
+                color: gainsboro;
+                width: 90%;
+                font-size: max(calc(min(100%, 100vh)), 2em);
+                font-weight: bold;
+                text-transform: uppercase;
+                position: absolute;
+                bottom: 0;
+                left: 5%;
+            }
+        </style>
+        <img src="media/img/logo-inverse.jpg">
+        <h2>Single-player version</h2>
+        <ul>
+            <li>Many players can play simultaneously, each using this single-player version. Be sure that all players finish each turn before starting a new one.</li>
+            <li>The <strong>Cursed</strong> event is a random event out in the wilds around the Dark Tower instead of being instigated by another player.</li>
+            <li>The <strong>Wizard</strong> joins your party and wards away a single <strong>Cursed</strong> event before departing. This interaction is identical to the way the <strong>Sword</strong> defeats the next <strong>Dragon</strong> appearance.</li>
+        </ul>
+        <button>Play</button>
     </template>
 </body>
 </html>
