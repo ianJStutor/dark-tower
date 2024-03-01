@@ -30,6 +30,10 @@
         <h2>Loading...</h2>
     </main>
 
+    <dialog>
+        <h2></h2>
+    </dialog>
+
     <template id="splash">
         <style>
             button {
@@ -162,13 +166,11 @@
             start.addEventListener("click", () => {
                 const playerNames = [...document.querySelectorAll("input")].map(i => i.value);
                 if (!playerNames.length) {
-                    //must be at least one player
-                    dt.media.audio.player_hit.play();
+                    dt.error("There must be at least one player!");
                     return;
                 }
                 if ((new Set(playerNames)).size < playerNames.length) {
-                    //cannot have two players with the same name
-                    dt.media.audio.player_hit.play();
+                    dt.error("Cannot have players with the same name!");
                     return;
                 }
                 dt.media.audio.end_turn.play();

@@ -54,4 +54,15 @@ darkTowerGame.loadScreen = (id) => {
     main.replaceChildren(template);
 };
 
+darkTowerGame.error = (message) => {
+    darkTowerGame.media.audio.player_hit.play();
+    const dialog = document.querySelector("dialog");
+    dialog.querySelector("h2").textContent = message;
+    dialog.showModal();
+    dialog.addEventListener("click", () => {
+        dialog.close();
+        darkTowerGame.media.audio.end_turn.play();
+    }, { once: true });
+};
+
 window.dt = darkTowerGame;

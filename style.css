@@ -37,3 +37,11 @@ h2 {
     text-align: center;
     color: gainsboro;
 }
+
+dialog {
+    background: brown;
+}
+
+::backdrop {
+    background: #000000bb;
+}
