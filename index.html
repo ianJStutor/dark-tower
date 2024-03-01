@@ -162,14 +162,20 @@
             start.addEventListener("click", () => {
                 const playerNames = [...document.querySelectorAll("input")].map(i => i.value);
                 if (!playerNames.length) {
-                    media.audio.player_hit.play();
+                    //must be at least one player
+                    dt.media.audio.player_hit.play();
+                    return;
+                }
+                if ((new Set(playerNames)).size < playerNames.length) {
+                    //cannot have two players with the same name
+                    dt.media.audio.player_hit.play();
                     return;
                 }
                 dt.media.audio.end_turn.play();
                 dt.playerNames = playerNames;
                 if (playerNames.length > 1) dt.loadScreen("getFirstPlayer");
                 else dt.loadScreen("singlePlayerNotes");
-            }, { once: true });
+            });
         </script>
     </template>
     <template id="getFirstPlayer">
