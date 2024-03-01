@@ -179,7 +179,42 @@
         </script>
     </template>
     <template id="getFirstPlayer">
+        <style>
+            button {
+                display: block;
+                margin: 1em auto;
+                padding: 1em;
+                border: none;
+                border-radius: 100vw;
+                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
+                color: gainsboro;
+            }
+            button:not(:first-of-type) {
+                width: 50%;
+            }
+            button:first-of-type {
+                width: 90%;
+                font-size: max(calc(min(100%, 100vh)), 2em);
+                font-weight: bold;
+                text-transform: uppercase;
+                position: absolute;
+                bottom: 0;
+                left: 5%;
+            }
+        </style>
+        <img src="media/img/logo-inverse.jpg">
         <h2>Who plays first?</h2>
+        <menu>
+            <button>Randomize</button>
+        </menu>
+        <script>
+            const buttons = dt.playerNames.map(player => {
+                let button = document.createElement("button");
+                button.textContent = player;
+                return button;
+            });
+            document.querySelector("menu").append(...buttons);
+        </script>
     </template>
     <template id="singlePlayerNotes">
         <style>
