@@ -166,12 +166,17 @@
                     return;
                 }
                 dt.media.audio.end_turn.play();
-                dt.loadScreen("getFirstPlayer");
+                dt.playerNames = playerNames;
+                if (playerNames.length > 1) dt.loadScreen("getFirstPlayer");
+                else dt.loadScreen("singlePlayerNotes");
             }, { once: true });
         </script>
     </template>
     <template id="getFirstPlayer">
-        <h2>Get first player</h2>
+        <h2>Who plays first?</h2>
+    </template>
+    <template id="singlePlayerNotes">
+        <h2>Changes for single players</h2>
     </template>
 </body>
 </html>
