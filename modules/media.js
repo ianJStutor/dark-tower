@@ -6,17 +6,17 @@ const types = {
 };
 
 export default async function loadMedia(resources, callback) {
-    let loaded = 0;
-
-    for (let resource of resources) {
-        if (!media[resource.type]) media[resource.type] = {};
-        const { res, event } = types[resource.type]?.();
-        res.addEventListener(event, () => {
-            if (++loaded >= resources.length) callback?.(media);
-        }, { once: true });
-        res.src = resource.path;
-        media[resource.type][resource.name] = res;
-    }
-
+    Promise.all(
+        resources.map(({ type, path, name }) => new Promise( (resolve, reject) => {
+            if (!media[type]) media[type] = {};
+            const { res, event } = types[type]?.();
+            res.addEventListener(event, resolve, { once: true });
+            res.addEventListener("error", reject, { once: true });
+            res.src = path;
+            media[type][name] = res;
+        }))
+    )
+    .then(() => callback?.())
+    .catch(console.error);
     return media;
 }
