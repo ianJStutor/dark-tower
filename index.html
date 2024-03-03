@@ -36,19 +36,6 @@
 
     <template id="splash">
         <style>
-            button {
-                display: block;
-                width: 90%;
-                margin: auto;
-                padding: 1em;
-                border: none;
-                border-radius: 100em;
-                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
-                color: gainsboro;
-                font-size: max(calc(min(100%, 100vh)), 2em);
-                font-weight: bold;
-                text-transform: uppercase;
-            }
             .out button {
                 transition: 0.25s;
                 transform: scale(0);
@@ -67,9 +54,10 @@
             }
         </style>
         <img src="media/img/Dark-Tower-Cover.jpg" alt="Dark Tower box cover">
-        <button>Play</button>
+        <button class="big">Play</button>
         <img src="media/img/player-gradient.png" alt="Player silhouette">
         <script>
+        {
             document.querySelector("button").addEventListener("click", () => {
                 document.body.className = "out";
                 dt.media.audio.intro.addEventListener("ended", () => {
@@ -81,6 +69,7 @@
                 }, { once: true });
                 dt.media.audio.intro.play();
             }, { once: true });
+        }
         </script>
     </template>
     <template id="getPlayers">
@@ -104,31 +93,7 @@
                 padding: 0.5em;
                 border-radius: 0.5em;
             }
-            button {
-                display: block;
-                margin: 1em auto;
-                padding: 1em;
-                border: none;
-                border-radius: 100vw;
-                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
-                color: gainsboro;
-            }
-            button[disabled] {
-                background: dimgray;
-                color: #555;
-            }
-            button:first-of-type {
-                width: 50%;
-            }
-            button:last-of-type {
-                width: 90%;
-                font-size: max(calc(min(100%, 100vh)), 2em);
-                font-weight: bold;
-                text-transform: uppercase;
-                position: absolute;
-                bottom: 0;
-                left: 5%;
-            }
+            
             .in h2 {
                 animation: slidein 2s forwards;
             }
@@ -144,8 +109,9 @@
             <li><input placeholder="player 1 name"></li>
         </ul>
         <button>Add player</button>
-        <button disabled>Start!</button>
+        <button class="big bottom" disabled>Start!</button>
         <script>
+        {
             document.body.className = "in";
             const [addPlayer, start] = document.querySelectorAll("button");
             const ul = document.querySelector("ul");
@@ -178,70 +144,35 @@
                 if (playerNames.length > 1) dt.loadScreen("getFirstPlayer");
                 else dt.loadScreen("singlePlayerNotes");
             });
+        }
         </script>
     </template>
     <template id="getFirstPlayer">
-        <style>
-            button {
-                display: block;
-                margin: 1em auto;
-                padding: 1em;
-                border: none;
-                border-radius: 100vw;
-                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
-                color: gainsboro;
-            }
-            button:not(:first-of-type) {
-                width: 50%;
-            }
-            button:first-of-type {
-                width: 90%;
-                font-size: max(calc(min(100%, 100vh)), 2em);
-                font-weight: bold;
-                text-transform: uppercase;
-                position: absolute;
-                bottom: 0;
-                left: 5%;
-            }
-        </style>
+        <button class="small">◂ Back</button>
         <img src="media/img/logo-inverse.jpg">
         <h2>Who plays first?</h2>
         <menu>
-            <button>Randomize</button>
+            <button class="big bottom">Randomize</button>
         </menu>
         <script>
+        {
             const buttons = dt.playerNames.map(player => {
                 let button = document.createElement("button");
                 button.textContent = player;
                 return button;
             });
             document.querySelector("menu").append(...buttons);
+        }
         </script>
     </template>
     <template id="singlePlayerNotes">
         <style>
             ul {
-                color: gainsboro;
-            }
-            li {
-                margin: 1em;
-                font-size: larger;
-            }
-            button {
-                padding: 1em;
-                border: none;
-                border-radius: 100vw;
-                background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
-                color: gainsboro;
-                width: 90%;
-                font-size: max(calc(min(100%, 100vh)), 2em);
-                font-weight: bold;
-                text-transform: uppercase;
-                position: absolute;
-                bottom: 0;
-                left: 5%;
+                height: 40vh;
+                overflow: auto;
             }
         </style>
+        <button class="small">◂ Back</button>
         <img src="media/img/logo-inverse.jpg">
         <h2>Single-player version</h2>
         <ul>
@@ -249,7 +180,14 @@
             <li>The <strong>Cursed</strong> event is a random event out in the wilds around the Dark Tower instead of being instigated by another player.</li>
             <li>The <strong>Wizard</strong> joins your party and wards away a single <strong>Cursed</strong> event before departing. This interaction is identical to the way the <strong>Sword</strong> defeats the next <strong>Dragon</strong> appearance.</li>
         </ul>
-        <button>Play</button>
+        <button class="big bottom">Play</button>
+        <script>
+        {
+            document.querySelector("button").addEventListener("click", () => {
+
+            });
+        }
+        </script>
     </template>
 </body>
 </html>

@@ -27,10 +27,10 @@ img {
     display: block;
 }
 
-button {
-    cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
+li {
+    color: gainsboro;
+    margin: 1em;
+    font-size: larger;
 }
 
 h2 {
@@ -44,4 +44,41 @@ dialog {
 
 ::backdrop {
     background: #000000bb;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    display: block;
+    width: 50%;
+    margin: 1em auto;
+    padding: 1em;
+    border: none;
+    border-radius: 100vw;
+    background: linear-gradient(orange 1%, orangered, brown 25%, rgb(70, 29, 22), #222);
+    color: gainsboro;
+}
+
+button[disabled] {
+    background: dimgray;
+    color: #555;
+}
+
+button.small {
+    margin: 1em;
+    padding: 0.25em;
+}
+
+button.big {
+    width: 90%;
+    font-size: max(calc(min(100%, 100vh)), 2em);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+button.bottom {
+    position: absolute;
+    bottom: 0;
+    left: 5%;
 }
