@@ -5,7 +5,7 @@ const types = {
     audio() { return { res: new Audio(), event: "canplaythrough" }; }
 };
 
-export default async function loadMedia(resources, callback) {
+export default async function loadMedia(resources, callback, error) {
     Promise.all(
         resources.map(({ type, path, name }) => new Promise( (resolve, reject) => {
             if (!media[type]) media[type] = {};
@@ -17,6 +17,6 @@ export default async function loadMedia(resources, callback) {
         }))
     )
     .then(() => callback?.())
-    .catch(console.error);
+    .catch(err => error?.(err));
     return media;
 }

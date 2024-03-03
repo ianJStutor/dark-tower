@@ -1,6 +1,24 @@
 import loadMedia from "./media.js";
 import darkTowerGame from "./darkTowerGame.js";
 
+darkTowerGame.loadScreen = (id) => {
+    document.body.className = "";
+    const main = document.querySelector("main");
+    const template = document.getElementById(id).content.cloneNode(true);
+    main.replaceChildren(template);
+};
+
+darkTowerGame.error = (message) => {
+    darkTowerGame.media.audio.player_hit.play();
+    const dialog = document.querySelector("dialog");
+    dialog.querySelector("h2").textContent = message;
+    dialog.showModal();
+    dialog.addEventListener("click", () => {
+        dialog.close();
+        darkTowerGame.media.audio.end_turn.play();
+    }, { once: true });
+};
+
 darkTowerGame.media = await loadMedia([
     { type: "audio", name: "battle", path: "./media/audio/battle.wav" },
     { type: "audio", name: "bazaar_closed", path: "./media/audio/bazaar-closed.wav" },
@@ -45,24 +63,6 @@ darkTowerGame.media = await loadMedia([
     { type: "image", name: "warrior", path: "./media/img/warrior.jpg" },
     { type: "image", name: "warriors", path: "./media/img/warriors.jpg" },
     { type: "image", name: "wizard", path: "./media/img/wizard.jpg" },
-], () => darkTowerGame.loadScreen("splash"));
-
-darkTowerGame.loadScreen = (id) => {
-    document.body.className = "";
-    const main = document.querySelector("main");
-    const template = document.getElementById(id).content.cloneNode(true);
-    main.replaceChildren(template);
-};
-
-darkTowerGame.error = (message) => {
-    darkTowerGame.media.audio.player_hit.play();
-    const dialog = document.querySelector("dialog");
-    dialog.querySelector("h2").textContent = message;
-    dialog.showModal();
-    dialog.addEventListener("click", () => {
-        dialog.close();
-        darkTowerGame.media.audio.end_turn.play();
-    }, { once: true });
-};
+], () => darkTowerGame.loadScreen("splash"), darkTowerGame.error);
 
 window.dt = darkTowerGame;
