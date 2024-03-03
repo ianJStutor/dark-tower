@@ -164,7 +164,7 @@
                 ul.querySelector("li:last-of-type input").focus();
             });
             start.addEventListener("click", () => {
-                const playerNames = [...document.querySelectorAll("input")].map(i => i.value);
+                const playerNames = [...document.querySelectorAll("input")].map(i => i.value.trim()).filter(i => i.length);
                 if (!playerNames.length) {
                     dt.error("There must be at least one player!");
                     return;
