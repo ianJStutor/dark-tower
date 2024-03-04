@@ -176,7 +176,12 @@
             });
             //randomize button
             document.querySelector("button:last-of-type").addEventListener("click", () => {
-
+                dt.playerNames.sort(() => Math.sign(Math.random() - 0.5));
+                dt.media.audio.enemy_hit.addEventListener("ended", () => {
+                    dt.media.audio.whirrbeep.play();
+                    dt.loadScreen("playerTurn");
+                }, { once: true });
+                dt.media.audio.enemy_hit.play();
             });
             //player name buttons
             const buttons = dt.playerNames.map(player => {
@@ -185,8 +190,16 @@
                 return button;
             });
             document.querySelector("menu").append(...buttons);
-            document.querySelectorAll("menu button").forEach(b => {
-
+            document.querySelectorAll("menu button").forEach((b,i) => {
+                b.addEventListener("click", () => {
+                    const { playerNames } = dt;
+                    dt.playerNames = [...playerNames.slice(i), ...playerNames.slice(0, i)];
+                    dt.media.audio.enemy_hit.addEventListener("ended", () => {
+                        dt.media.audio.whirrbeep.play();
+                        dt.loadScreen("playerTurn");
+                    }, { once: true });
+                    dt.media.audio.enemy_hit.play();
+                });
             });
         }
         </script>
@@ -208,8 +221,19 @@
                 dt.media.audio.click.play();
                 dt.loadScreen("getPlayers");
             });
+            //play button
+            document.querySelector("button:last-of-type").addEventListener("click", () => {
+                dt.media.audio.enemy_hit.addEventListener("ended", () => {
+                    dt.media.audio.whirrbeep.play();
+                    dt.loadScreen("playerTurn");
+                }, { once: true });
+                dt.media.audio.enemy_hit.play();
+            });
         }
         </script>
+    </template>
+    <template id="playerTurn">
+        <h2>Player turn</h2>
     </template>
 </body>
 </html>
