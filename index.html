@@ -83,8 +83,6 @@
             ul {
                 padding: 0;
                 list-style-type: none;
-                max-height: 60vh;
-                overflow-y: auto;
             }
             input {
                 display: block;
@@ -100,27 +98,43 @@
             .in h2 ~ * {
                 animation: slidein 1s forwards;
             }
+            .alreadyin :is(h2, h2 ~ *) {
+                translate: 0;
+            }
             @keyframes slidein {
                 to { translate: 0 0; }
             }
         </style>
         <h2>Players</h2>
-        <ul>
+        <ul class="centerrow">
             <li><input placeholder="player 1 name"></li>
         </ul>
         <button>Add player</button>
-        <button class="big bottom" disabled>Start!</button>
+        <button class="big bottom">Start!</button>
         <script>
         {
-            document.body.className = "in";
-            const [addPlayer, start] = document.querySelectorAll("button");
             const ul = document.querySelector("ul");
+            //coming back to this screen?
+            if (dt.playerNames?.length) {
+                const inputs = dt.playerNames.map((p,i) => {
+                    const li = document.createElement("li");
+                    const input = document.createElement("input");
+                    input.setAttribute("value", p);
+                    input.setAttribute("placeholder", `player ${i+1} name`);
+                    li.append(input);
+                    return li;
+                });
+                ul.replaceChildren(...inputs);
+                document.body.className = "alreadyin";
+            }
+            //or coming from intro?
+            else document.body.className = "in";
+            //inputs
             const firstPlayer = document.querySelector("input");
-            setTimeout(() => { firstPlayer.focus(); }, 1000);
-            firstPlayer.addEventListener("input", () => {
-                if (firstPlayer.value) start.removeAttribute("disabled");
-                else start.setAttribute("disabled", true);
-            });
+            if (dt.playerNames?.length) firstPlayer.focus();
+            else setTimeout(() => { firstPlayer.focus(); }, 1000);
+            //buttons
+            const [addPlayer, start] = document.querySelectorAll("button");
             addPlayer.addEventListener("click", () => {
                 dt.media.audio.click.play();
                 const nextNum = ul.childElementCount + 1;
@@ -151,31 +165,37 @@
         <button class="small">◂ Back</button>
         <img src="media/img/logo-inverse.jpg">
         <h2>Who plays first?</h2>
-        <menu>
-            <button class="big bottom">Randomize</button>
-        </menu>
+        <menu class="centerrow"></menu>
+        <button class="big bottom">Randomize</button>
         <script>
         {
+            //back button
+            document.querySelector("button").addEventListener("click", () => {
+                dt.media.audio.click.play();
+                dt.loadScreen("getPlayers");
+            });
+            //randomize button
+            document.querySelector("button:last-of-type").addEventListener("click", () => {
+
+            });
+            //player name buttons
             const buttons = dt.playerNames.map(player => {
                 let button = document.createElement("button");
                 button.textContent = player;
                 return button;
             });
             document.querySelector("menu").append(...buttons);
+            document.querySelectorAll("menu button").forEach(b => {
+
+            });
         }
         </script>
     </template>
     <template id="singlePlayerNotes">
-        <style>
-            ul {
-                height: 40vh;
-                overflow: auto;
-            }
-        </style>
         <button class="small">◂ Back</button>
         <img src="media/img/logo-inverse.jpg">
         <h2>Single-player version</h2>
-        <ul>
+        <ul class="centerrow">
             <li>Many players can play simultaneously, each using this single-player version. Be sure that all players finish each turn before starting a new one.</li>
             <li>The <strong>Cursed</strong> event is a random event out in the wilds around the Dark Tower instead of being instigated by another player.</li>
             <li>The <strong>Wizard</strong> joins your party and wards away a single <strong>Cursed</strong> event before departing. This interaction is identical to the way the <strong>Sword</strong> defeats the next <strong>Dragon</strong> appearance.</li>
@@ -183,8 +203,10 @@
         <button class="big bottom">Play</button>
         <script>
         {
+            //back button
             document.querySelector("button").addEventListener("click", () => {
-
+                dt.media.audio.click.play();
+                dt.loadScreen("getPlayers");
             });
         }
         </script>

@@ -33,6 +33,10 @@ li {
     font-size: larger;
 }
 
+strong {
+    color: orange;
+}
+
 h2 {
     text-align: center;
     color: gainsboro;
@@ -81,4 +85,9 @@ button.bottom {
     position: absolute;
     bottom: 0;
     left: 5%;
+}
+
+.centerrow {
+    max-height: 40vh;
+    overflow: auto;
 }
