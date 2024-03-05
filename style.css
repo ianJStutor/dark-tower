@@ -33,13 +33,13 @@ li {
     font-size: larger;
 }
 
-strong {
-    color: orange;
-}
-
 h2, h3 {
     text-align: center;
     color: gainsboro;
+}
+
+h3, strong {
+    color: orange;
 }
 
 dialog {

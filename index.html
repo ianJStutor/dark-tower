@@ -233,15 +233,28 @@
         </script>
     </template>
     <template id="playerTurn">
+        <style>
+            img, h3, h2 {
+                translate: 0 -1000%;
+                animation: slidein 0.5s forwards;
+            }
+            button {
+                translate: 0 200%;
+                animation: slidein 2s forwards;
+            }
+            @keyframes slidein {
+                to { translate: 0 0; }
+            }
+        </style>
         <img src="media/img/logo-inverse.jpg">
         <h3>Player turn</h3>
         <h2></h2>
-        <button class="big">Play</button>
+        <button class="big bottom">Play</button>
         <script>
         {
             if (dt.currentPlayer === null) dt.setupGame();
             const { name } = dt.players[dt.currentPlayer];
-            document.querySelector("h2").textContent = name;
+            setTimeout( () => document.querySelector("h2").textContent = name, 1000);
         }
         </script>
     </template>
