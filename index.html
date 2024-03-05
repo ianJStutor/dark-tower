@@ -233,7 +233,17 @@
         </script>
     </template>
     <template id="playerTurn">
-        <h2>Player turn</h2>
+        <img src="media/img/logo-inverse.jpg">
+        <h3>Player turn</h3>
+        <h2></h2>
+        <button class="big">Play</button>
+        <script>
+        {
+            if (dt.currentPlayer === null) dt.setupGame();
+            const { name } = dt.players[dt.currentPlayer];
+            document.querySelector("h2").textContent = name;
+        }
+        </script>
     </template>
 </body>
 </html>
