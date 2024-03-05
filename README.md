@@ -36,6 +36,10 @@ Any number of players may play the game in this way.
 
 * Winning the Wizard as treasure after a successful battle acts as protection from a random Cursed event, much as the Healer protects from Plague. There is no true interaction among players.
 
+## Security
+
+None. This works completely in the front end and there is no back-end storage or database. There is an easily manipulated global object stored in the browser memory. The game can be hacked from the browser, so don't play with cheaters. There are no current plans to protect the game with better security.
+
 ## Author
 
 > [Ian Marshall](https://ianjstutor.github.io/ian-marshall/)
