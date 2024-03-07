@@ -55,6 +55,24 @@ class DarkTowerGame {
         this.players = [];
         this.currentPlayer = null;
     }
+
+    turn(player) {
+        const turnState = [];
+        return {
+            yes() {},
+            repeat() {},
+            no() {},
+            haggle() {},
+            bazaar() {},
+            clear() {},
+            tomb() {},
+            move() {},
+            sanctuary() {},
+            darkTower() {},
+            frontier() {},
+            inventory() {},
+        };
+    }
 };
 
 const darkTowerGame = new DarkTowerGame();
