@@ -270,25 +270,53 @@
     </template>
     <template id="play">
         <style>
-
+            div {
+                display: grid;
+                grid-template-rows: 10vh 35vh 50vh 5vh;
+                justify-items: center;
+            }
+            div > * {
+                margin: 0;
+            }
+            output {
+                align-self: center;
+                text-align: center;
+                font-size: 3em;
+                color: red;
+                font-family: monospace;
+            }
+            menu {
+                display: grid;
+                grid-template: repeat(4, 1fr) / repeat(3, 1fr);
+            }
+            img {
+                width: 90%;
+                aspect-ratio: 172 / 123;
+                object-fit: cover;
+            }
+            h3 {
+                align-self: center;
+            }
         </style>
-        <h3></h3>
-        <output></output>
-        <img>
-        <menu>
-            <button id="yes">Yes <span>Buy</span></button>
-            <button id="repeat">Repeat</button>
-            <button id="no">No <span>End</span></button>
-            <button id="haggle">Haggle</button>
-            <button id="bazaar">Bazaar</button>
-            <button id="clear">Clear</button>
-            <button id="tomb">Tomb <span>Ruin</span></button>
-            <button id="move">Move</button>
-            <button id="sanctuary">Sanctuary <span>Citadel</span></button>
-            <button id="darkTower">Dark Tower</button>
-            <button id="frontier">Frontier</button>
-            <button id="inventory">Inventory</button>
-        </menu>
+        <div>
+            <output>10</output>
+            <img src="media/img/bazaar.jpg">
+            <menu>
+                <button id="yes">Yes <span>Buy</span></button>
+                <button id="repeat">Repeat</button>
+                <button id="no">No <span>End</span></button>
+                <button id="haggle">Haggle</button>
+                <button id="bazaar">Bazaar</button>
+                <button id="clear">Clear</button>
+                <button id="tomb">Tomb <span>Ruin</span></button>
+                <button id="move">Move</button>
+                <button id="sanctuary" disabled>Sanctuary <span>Citadel</span></button>
+                <button id="darkTower">Dark Tower</button>
+                <button id="frontier">Frontier</button>
+                <button id="inventory">Inventory</button>
+            </menu>
+            <h3></h3>
+        </div>
         <script>
             //player name
             const { name } = dt.players[dt.currentPlayer];
