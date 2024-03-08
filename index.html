@@ -278,6 +278,9 @@
             div > * {
                 margin: 0;
             }
+            figure {
+                width: 90%;
+            }
             output {
                 align-self: center;
                 text-align: center;
@@ -322,12 +325,30 @@
             const player = dt.players[dt.currentPlayer];
             document.querySelector("h3").textContent = player.name;
             const keys = document.querySelectorAll("menu button");
+            const output = document.querySelector("output");
+            const figure = document.querySelector("figure");
             //state
-            function takeTurn() {
+            player.turnState = [];
+            function takeTurn(newState) {
+                if (newState) player.turnState.push(newState);
                 const turn = dt.turn(player);
+                if (turn.output) output.textContent = turn.output;
+                else output.textContent = "";
+                if (turn.img) figure.replaceChildren(turn.img);
+                else figure.replaceChildren();
                 keys.forEach((b,i) => {
-                    if (Boolean(Number(turn.keys[i]))) b.removeAttribute("disabled");
-                    else b.setAttribute("disabled", true);
+                    if (Boolean(Number(turn.keys[i]))) {
+                        b.removeAttribute("disabled");
+                        b.onclick = () => {
+                            dt.media.audio.click.play();
+                            const newState = turn.state[b.id];
+                            if (newState) takeTurn(newState);
+                        }
+                    }
+                    else {
+                        b.setAttribute("disabled", true);
+                        b.onclick = () => {};
+                    }
                 });
                 console.log(turn);
             }
