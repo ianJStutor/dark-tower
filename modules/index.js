@@ -1,6 +1,8 @@
 import loadMedia from "./media.js";
 import darkTowerGame from "./darkTowerGame.js";
 
+const dev = true;
+
 darkTowerGame.loadScreen = (id) => {
     document.body.className = "";
     const main = document.querySelector("main");
@@ -63,6 +65,12 @@ darkTowerGame.media = await loadMedia([
     { type: "image", name: "warrior", path: "./media/img/warrior.jpg" },
     { type: "image", name: "warriors", path: "./media/img/warriors.jpg" },
     { type: "image", name: "wizard", path: "./media/img/wizard.jpg" },
-], () => darkTowerGame.loadScreen("splash"), darkTowerGame.error);
+], () => {
+    if (dev) {
+        window.dt.playerNames = ["Ian"];
+        window.dt.loadScreen("playerTurn");
+    }
+    else darkTowerGame.loadScreen("splash")
+}, darkTowerGame.error);
 
 window.dt = darkTowerGame;

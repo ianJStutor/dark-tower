@@ -44,8 +44,9 @@ h3, strong {
 
 menu {
     display: grid;
-    grid-template: 4 / 3;
+    grid-template: repeat(4, 1fr) / repeat(3, 1fr);
     height: 50vh;
+    width: 100%;
     position: absolute;
     bottom: 0;
 }
@@ -58,10 +59,23 @@ dialog {
     background: #000000bb;
 }
 
-main > button {
+button {
     cursor: pointer;
     font-family: inherit;
     font-size: inherit;
+}
+
+button span {
+    display: block;
+    border-top: 1px solid black;
+}
+
+menu > button {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+main > button {
     display: block;
     width: 50%;
     margin: 1em auto;
@@ -100,6 +114,30 @@ button.bottom {
     overflow: auto;
 }
 
+#yes:not([disabled]) {
+    background: #53925d;
+}
+#repeat:not([disabled]) {
+    background: #b9998c;
+}
+#no:not([disabled]) {
+    background: #eb512b;
+}
+#haggle:not([disabled]) {
+    background: #e88b3d;
+}
+:is(#bazaar, #tomb, #move, #sanctuary, #frontier):not([disabled]) {
+    background: #4390c4;
+}
+#clear:not([disabled]) {
+    background: #ddbca9;
+}
+#darkTower:not([disabled]) {
+    background: #e86b3d;
+}
+#inventory:not([disabled]) {
+    background: #c79c57;
+}
 
 
 .spinner { position: relative; width: 25%; margin: auto; aspect-ratio: 1 / 1; }

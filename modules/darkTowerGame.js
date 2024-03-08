@@ -48,7 +48,6 @@ class DarkTowerGame {
             frontier: 0
         }));
         this.currentPlayer = 0;
-        console.log(this);
     }
     resetGame() {
         this.playerNames = [];
