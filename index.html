@@ -28,6 +28,7 @@
     <main>
         <img src="media/img/logo-inverse.jpg">
         <h2>Loading...</h2>
+        <div class="spinner"></div>
     </main>
 
     <dialog>
@@ -121,6 +122,7 @@
                     const input = document.createElement("input");
                     input.setAttribute("value", p);
                     input.setAttribute("placeholder", `player ${i+1} name`);
+                    input.addEventListener("blur", () => input.value = input.value.trim());
                     li.append(input);
                     return li;
                 });
@@ -132,7 +134,10 @@
             //inputs
             const firstPlayer = document.querySelector("input");
             if (dt.playerNames?.length) firstPlayer.focus();
-            else setTimeout(() => { firstPlayer.focus(); }, 1000);
+            else {
+                firstPlayer.addEventListener("blur", () => firstPlayer.value = firstPlayer.value.trim());
+                setTimeout(() => { firstPlayer.focus(); }, 1000);
+            }
             //buttons
             const [addPlayer, start] = document.querySelectorAll("button");
             addPlayer.addEventListener("click", () => {
@@ -141,7 +146,9 @@
                 const li = document.createElement("li");
                 li.innerHTML = `<input placeholder="player ${nextNum} name">`;
                 ul.append(li);
-                ul.querySelector("li:last-of-type input").focus();
+                const input = ul.querySelector("li:last-of-type input");
+                input.addEventListener("blur", () => input.value = input.value.trim());
+                input.focus();
             });
             start.addEventListener("click", () => {
                 const playerNames = [...document.querySelectorAll("input")].map(i => i.value.trim()).filter(i => i.length);
@@ -255,7 +262,37 @@
             if (dt.currentPlayer === null) dt.setupGame();
             const { name } = dt.players[dt.currentPlayer];
             setTimeout( () => document.querySelector("h2").textContent = name, 1000);
+            document.querySelector("button").addEventListener("click", () => {
+                dt.loadScreen("play");
+            });
         }
+        </script>
+    </template>
+    <template id="play">
+        <style>
+
+        </style>
+        <h3></h3>
+        <output></output>
+        <img>
+        <menu>
+            <button id="yes">Yes <span>Buy</span></button>
+            <button id="repeat">Repeat</button>
+            <button id="no">No <span>End</span></button>
+            <button id="haggle">Haggle</button>
+            <button id="bazaar">Bazaar</button>
+            <button id="clear">Clear</button>
+            <button id="tomb">Tomb <span>Ruin</span></button>
+            <button id="move">Move</button>
+            <button id="sanctuary">Sanctuary <span>Citadel</span></button>
+            <button id="darkTower">Dark Tower</button>
+            <button id="frontier">Frontier</button>
+            <button id="inventory">Inventory</button>
+        </menu>
+        <script>
+            //player name
+            const { name } = dt.players[dt.currentPlayer];
+            document.querySelector("h3").textContent = name;
         </script>
     </template>
 </body>

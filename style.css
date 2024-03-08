@@ -42,6 +42,14 @@ h3, strong {
     color: orange;
 }
 
+menu {
+    display: grid;
+    grid-template: 4 / 3;
+    height: 50vh;
+    position: absolute;
+    bottom: 0;
+}
+
 dialog {
     background: brown;
 }
@@ -50,7 +58,7 @@ dialog {
     background: #000000bb;
 }
 
-button {
+main > button {
     cursor: pointer;
     font-family: inherit;
     font-size: inherit;
@@ -91,3 +99,15 @@ button.bottom {
     max-height: 40vh;
     overflow: auto;
 }
+
+
+
+.spinner { position: relative; width: 25%; margin: auto; aspect-ratio: 1 / 1; }
+
+.spinner::before, .spinner::after { content: ""; display: block; position: absolute; animation: 1.5s linear 0s infinite normal none running spinner; }
+
+.spinner::before { inset: 20%; border-radius: 50%; border-top: 10px solid orange; border-right: 20px solid transparent; filter: blur(3px); }
+
+.spinner::after { inset: 10%; background: radial-gradient(circle closest-side at 75% 25%, white, orange, transparent); }
+
+@keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
