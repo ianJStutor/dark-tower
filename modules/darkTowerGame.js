@@ -45,7 +45,8 @@ class DarkTowerGame {
                 ["wizard", 0],
                 ["pegasus", 0]
             ]),
-            frontier: 0
+            frontier: 0,
+            turnState: []
         }));
         this.currentPlayer = 0;
     }
@@ -56,23 +57,29 @@ class DarkTowerGame {
     }
 
     turn(player) {
-        const turnState = [];
-        return {
-            yes() {},
-            repeat() {},
-            no() {},
-            haggle() {},
-            bazaar() {},
-            clear() {},
-            tomb() {},
-            move() {},
-            sanctuary() {},
-            darkTower() {},
-            frontier() {},
-            inventory() {},
-        };
+        if (!player.turnState.at(-1)) player.turnState = ["start"];
+        return DarkTowerStates[player.turnState.at(-1)]?.(player, this);
     }
 };
+
+class DarkTowerStates {
+    static start(player) {
+        return {
+            keys: "000010111111",
+            output: null,
+            img: null,
+            state: {
+                bazaar: "bazaar",
+                tomb: "tomb",
+                move: "move",
+                sanctuary: "sanctuary",
+                darkTower: "darkTower",
+                frontier: "frontier",
+                inventory: "inventory_warriors"
+            }
+        };
+    }
+}
 
 const darkTowerGame = new DarkTowerGame();
 export default darkTowerGame;

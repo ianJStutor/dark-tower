@@ -282,7 +282,7 @@
                 align-self: center;
                 text-align: center;
                 font-size: 3em;
-                color: red;
+                color: rgb(255, 101, 101);
                 font-family: monospace;
             }
             menu {
@@ -299,8 +299,8 @@
             }
         </style>
         <div>
-            <output>10</output>
-            <img src="media/img/bazaar.jpg">
+            <output></output>
+            <figure></figure>
             <menu>
                 <button id="yes">Yes <span>Buy</span></button>
                 <button id="repeat">Repeat</button>
@@ -310,7 +310,7 @@
                 <button id="clear">Clear</button>
                 <button id="tomb">Tomb <span>Ruin</span></button>
                 <button id="move">Move</button>
-                <button id="sanctuary" disabled>Sanctuary <span>Citadel</span></button>
+                <button id="sanctuary">Sanctuary <span>Citadel</span></button>
                 <button id="darkTower">Dark Tower</button>
                 <button id="frontier">Frontier</button>
                 <button id="inventory">Inventory</button>
@@ -318,9 +318,22 @@
             <h3></h3>
         </div>
         <script>
-            //player name
-            const { name } = dt.players[dt.currentPlayer];
-            document.querySelector("h3").textContent = name;
+            //DOM
+            const player = dt.players[dt.currentPlayer];
+            document.querySelector("h3").textContent = player.name;
+            const keys = document.querySelectorAll("menu button");
+            //state
+            function takeTurn() {
+                const turn = dt.turn(player);
+                keys.forEach((b,i) => {
+                    if (Boolean(Number(turn.keys[i]))) b.removeAttribute("disabled");
+                    else b.setAttribute("disabled", true);
+                });
+                console.log(turn);
+            }
+            //events
+            //start
+            takeTurn();
         </script>
     </template>
 </body>
