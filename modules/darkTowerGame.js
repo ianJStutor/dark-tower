@@ -60,6 +60,9 @@ class DarkTowerGame {
         if (!player.turnState.at(-1)) player.turnState = ["start"];
         return DarkTowerStates[player.turnState.at(-1)]?.(player, this);
     }
+    nextPlayer() {
+        this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
+    }
 };
 
 class DarkTowerStates {
@@ -67,8 +70,6 @@ class DarkTowerStates {
         return {
             name: "start",
             keys: "000010111111",
-            output: null,
-            img: null,
             state: {
                 bazaar: "bazaar",
                 tomb: "tomb",
@@ -111,10 +112,38 @@ class DarkTowerStates {
         };
     }
 
-    static frontier(player) {
-        return {
-            name: "frontier"
+    static frontier(player, dt) {
+        const ret = {
+            name: "frontier",
+            audio: dt.media.audio.frontier
         };
+        const success = Object.assign({
+            keys: "000000000000",
+            audioThen: {
+                keys: "001000000000"
+            },
+            state: {
+                no: "endTurn"
+            }
+        }, ret);
+        const noKey = Object.assign({
+            keys: "000000000000",
+            audioThen: {
+                audio: dt.media.audio.player_hit,
+                img: dt.media.image.keymissing,
+                keys: "000001000000"
+            },
+            state: {
+                clear: "start"
+            }
+        }, ret);
+        const keyNeeded = ["", "brassKey", "silverKey", "goldKey"];
+        const key = keyNeeded[player.frontier];console.log(key, key.length, !key.length);
+        if (!key.length || player.inventory.get(key)) {
+            player.frontier++;
+            return success;
+        }
+        return noKey;
     }
 
     static inventory_warriors(player, dt) {
