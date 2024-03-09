@@ -119,17 +119,16 @@ class DarkTowerStates {
                 }
             };
         }
-        const lockKeys = ["brassKey", "silverKey", "goldKey"].sort(() => Math.random() - 0.5);
-        if (!dt.lock.length) dt.lock = lockKeys.toSorted(() => Math.random() - 0.5);
-        dt.keyGuess = [lockKeys[0]];
+        dt.keyGuess = ["brassKey", "silverKey", "goldKey"].sort(() => Math.random() - 0.5);
+        if (!dt.lock.length) dt.lock = dt.keyGuess.toSorted(() => Math.random() - 0.5);
         let state;
-        if (dt.keyGuess === dt.lock[0]) state = {
+        if (dt.keyGuess[0] === dt.lock[0]) state = {
             yes: "keyGuessed",
-            no: "pickKey"
+            no: "pickKey1"
         };
         else state = {
             yes: "wrongKey",
-            no: "pickKey"
+            no: "pickKey1"
         };
         return {
             name: "darkTower",
@@ -137,23 +136,89 @@ class DarkTowerStates {
             audio: dt.media.audio.darktower,
             audioThen: {
                 keys: "101000000000",
-                img: dt.media.image[lockKeys[0]]
+                img: dt.media.image[dt.keyGuess[0].toLowerCase()]
             },
             state
         };
     }
 
     static keyGuessed(player, dt) {
-
+        let state;
+        if (dt.keyGuess[1] === dt.lock[1]) state = {
+            yes: "darkTower_battle",
+            no: "pickKey2"
+        };
+        else state = {
+            yes: "wrongKey",
+            no: "pickKey2"
+        };
+        return {
+            name: "keyGuessed",
+            keys: "101000000000",
+            audio: dt.media.audio.click,
+            img: dt.media.image[dt.keyGuess[1].toLowerCase()],
+            state
+        };
     }
 
-    static pickKey(player, dt) {
-        const keysRemaining = ["brassKey", "silverKey", "goldKey"].filter(k => !dt.keyGuess.includes(k)).sort(() => Math.random() - 0.5);
-        
+    static pickKey1(player, dt) {
+        dt.keyGuess = [...dt.keyGuess.slice(1), dt.keyGuess[0]];
+        let state;
+        if (dt.keyGuess[0] === dt.lock[0]) state = {
+            yes: "keyGuessed",
+            no: "pickKey1"
+        };
+        else state = {
+            yes: "wrongKey",
+            no: "pickKey1"
+        };
+        return {
+            name: "pickKey1",
+            keys: "101000000000",
+            audio: dt.media.audio.click,
+            img: dt.media.image[dt.keyGuess[0].toLowerCase()],
+            state
+        };
+    }
+
+    static pickKey2(player, dt) {
+        dt.keyGuess = [dt.keyGuess[0], dt.keyGuess[2], dt.keyGuess[1]];
+        let state;
+        if (dt.keyGuess[1] === dt.lock[1]) state = {
+            yes: "darkTower_battle",
+            no: "pickKey2"
+        };
+        else state = {
+            yes: "wrongKey",
+            no: "pickKey2"
+        };
+        return {
+            name: "pickKey2",
+            keys: "101000000000",
+            audio: dt.media.audio.click,
+            img: dt.media.image[dt.keyGuess[1].toLowerCase()],
+            state
+        };
     }
 
     static wrongKey(player, dt) {
         dt.keyGuess = null;
+        return {
+            keys: "000000000000",
+            audio: dt.media.audio.player_hit,
+            audioThen: {
+                keys: "001000000000"
+            },
+            state: {
+                no: "endTurn"
+            }
+        };
+    }
+
+    static darkTower_battle(player, dt) {
+        return {
+            output: "dark tower battle"
+        };
     }
 
     static frontier(player, dt) {
