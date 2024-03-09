@@ -4,6 +4,7 @@ class DarkTowerGame {
         this.playerNames = [];
         this.players = [];
         this.currentPlayer = null;
+        this.lock = [];
     }
 
     loadScreen() {}
@@ -106,10 +107,53 @@ class DarkTowerStates {
         };
     }
 
-    static darkTower(player) {
-        return {
-            name: "darkTower"
+    static darkTower(player, dt) {
+        if (player.frontier !== 4 || !["brassKey", "silverKey", "goldKey"].every(key => player.inventory.get(key))) {
+            return {
+                name: "darkTower",
+                keys: "000001000000",
+                img: dt.media.image.keymissing,
+                audio: dt.media.audio.player_hit,
+                state: {
+                    clear: "start"
+                }
+            };
+        }
+        const lockKeys = ["brassKey", "silverKey", "goldKey"].sort(() => Math.random() - 0.5);
+        if (!dt.lock.length) dt.lock = lockKeys.toSorted(() => Math.random() - 0.5);
+        dt.keyGuess = [lockKeys[0]];
+        let state;
+        if (dt.keyGuess === dt.lock[0]) state = {
+            yes: "keyGuessed",
+            no: "pickKey"
         };
+        else state = {
+            yes: "wrongKey",
+            no: "pickKey"
+        };
+        return {
+            name: "darkTower",
+            keys: "000000000000",
+            audio: dt.media.audio.darktower,
+            audioThen: {
+                keys: "101000000000",
+                img: dt.media.image[lockKeys[0]]
+            },
+            state
+        };
+    }
+
+    static keyGuessed(player, dt) {
+
+    }
+
+    static pickKey(player, dt) {
+        const keysRemaining = ["brassKey", "silverKey", "goldKey"].filter(k => !dt.keyGuess.includes(k)).sort(() => Math.random() - 0.5);
+        
+    }
+
+    static wrongKey(player, dt) {
+        dt.keyGuess = null;
     }
 
     static frontier(player, dt) {

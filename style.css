@@ -81,6 +81,7 @@ main > button {
 button[disabled] {
     background: dimgray;
     color: #555;
+    cursor: default;
 }
 
 button.small {
