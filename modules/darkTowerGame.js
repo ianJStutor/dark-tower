@@ -79,6 +79,14 @@ class DarkTowerStates {
         [[91,99], 7]
     ]);
 
+    static price = new Map([
+        ["warriors", { min: 4, max: 10 }],
+        ["food", { min: 1, max: 1 }],
+        ["beast", { min: 15, max: 20 }],
+        ["scout", { min: 15, max: 20 }],
+        ["healer", { min: 15, max: 20 }]
+    ]);
+
     static start(player, dt) {
         let [ warriors, food, gold ] = ["warriors", "food", "gold"].map(i => player.inventory.get(i));
         let toEat;
@@ -184,14 +192,19 @@ class DarkTowerStates {
 
     static bazaar(player, dt) {
         player.location = "bazaar";
+        const warriors_price = DarkTowerStates.price.get("warriors");
+        const food_price = DarkTowerStates.price.get("food");
         dt.bazaar = {
-            warrior: Math.floor(Math.random() * 7) + 4,
-            food: 1
+            warriors: Math.floor(Math.random() * (warriors_price.max - warriors_price.min +1)) + warriors_price.min,
+            food: Math.floor(Math.random() * (food_price.max - food_price.min +1)) + food_price.min
         };
         const extras = ["beast", "scout", "healer"].filter(i => !player.inventory.get(i));
         const rand = Math.floor(Math.random() * (extras.length + 1));
-        console.log(extras, rand, rand < extras.length);
-        if (rand < extras.length) dt.bazaar[extras[rand]] = Math.floor(Math.random() * 6) + 15;
+        if (rand < extras.length) {
+            const item = extras[rand];
+            const item_price = DarkTowerStates.price.get(item);
+            dt.bazaar[item] = Math.floor(Math.random() * (item_price.max - item_price.min +1)) + item_price.min;
+        }
         return {
             name: "bazaar",
             keys: "000000000000",
@@ -203,10 +216,10 @@ class DarkTowerStates {
     }
 
     static bazaar_warriors(player, dt) {
-        dt.bazaar_item = "warrior";
+        dt.bazaar_item = "warriors";
         dt.bazaar_qty = 0;
         return {
-            output: dt.bazaar.warrior.toString().padStart(2, "0"),
+            output: dt.bazaar.warriors.toString().padStart(2, "0"),
             img: dt.media.image.warrior,
             keys: "100101000000",
             state: {
@@ -232,7 +245,7 @@ class DarkTowerStates {
             state: {
                 yes: "bazaar_buy",
                 repeat: "bazaar_warriors",
-                haggle: "bazaar_closed",
+                haggle: "bazaar_haggle",
                 clear
             }
         };
@@ -291,11 +304,18 @@ class DarkTowerStates {
     }
 
     static bazaar_buy(player, dt) {
-
+        const item = dt.bazaar_item;
     }
 
     static bazaar_haggle(player, dt) {
-
+        const item = dt.bazaar_item;
+        const price = DarkTowerStates.price.get(item);
+        const chance = (dt.bazaar[item] - price.min) / (price.max - price.min);
+        if (Math.random() < chance) {
+            dt.bazaar[item]--;
+            return DarkTowerStates[`bazaar_${item}`](player, dt);
+        }
+        else return DarkTowerStates.bazaar_closed(player, dt);
     }
 
     static bazaar_closed(player, dt) {
