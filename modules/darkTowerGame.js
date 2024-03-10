@@ -354,7 +354,7 @@ class DarkTowerStates {
         }, ret);
         const keyNeeded = ["", "brassKey", "silverKey", "goldKey"];
         const key = keyNeeded[player.frontier];
-        if (!key.length || player.inventory.get(key)) {
+        if (key === "" || player.inventory.get(key)) {
             player.frontier++;
             return success;
         }

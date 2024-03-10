@@ -331,8 +331,10 @@
             const output = document.querySelector("output");
             const figure = document.querySelector("figure");
             //state
+            let timer = null;
             player.turnState = [];
             function changeState(newState) {
+                if (timer) clearTimeout(timer);
                 if (newState === "endTurn") {
                     dt.media.audio.end_turn.play();
                     dt.nextPlayer();
@@ -345,7 +347,14 @@
                 takeTurn(turn);
 
                 function takeTurn(turn) {
-                    if (turn.redirect) return changeState(turn.redirect);
+                    if (turn.redirect) {
+                        Object.values(dt.media.audio).forEach(audio => {
+                            audio.pause();
+                            audio.currentTime = 0;
+                            audio.onended = null;
+                        });
+                        return changeState(turn.redirect);
+                    }
                     if (turn.output) output.textContent = turn.output;
                     else output.textContent = "";
                     if (turn.img) figure.replaceChildren(turn.img);
@@ -360,7 +369,7 @@
                         turn.audio.play();
                     }
                     if (turn.delayThen) {
-                        setTimeout(() => takeTurn(turn.delayThen), turn.delay);
+                        timer = setTimeout(() => takeTurn(turn.delayThen), turn.delay);
                     }
                     turn.player = player;
                     console.log(turn);
