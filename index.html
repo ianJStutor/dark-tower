@@ -334,7 +334,6 @@
             let timer = null;
             player.turnState = [];
             function changeState(newState) {
-                if (timer) clearTimeout(timer);
                 if (newState === "endTurn") {
                     dt.media.audio.end_turn.play();
                     dt.nextPlayer();
@@ -346,14 +345,17 @@
                 const turn = dt.turn(player);
                 takeTurn(turn);
 
-                function takeTurn(turn) {
-                    if (turn.redirect) {
+                async function takeTurn(turn) {
+                    if (turn.redirect) return changeState(turn.redirect);
+                    if (turn.name === "battle_escape") {
+                        if (timer) clearTimeout(timer);
                         Object.values(dt.media.audio).forEach(audio => {
-                            audio.pause();
-                            audio.currentTime = 0;
-                            audio.onended = null;
+                            if (!audio.paused) {
+                                audio.pause();
+                                audio.currentTime = 0;
+                                audio.onended = null;
+                            }
                         });
-                        return changeState(turn.redirect);
                     }
                     if (turn.output) output.textContent = turn.output;
                     else output.textContent = "";
@@ -366,7 +368,7 @@
                                 takeTurn(turn.audioThen);
                             }, { once: true });
                         }
-                        turn.audio.play();
+                        await turn.audio.play().catch(console.error);
                     }
                     if (turn.delayThen) {
                         timer = setTimeout(() => takeTurn(turn.delayThen), turn.delay);
