@@ -205,6 +205,7 @@ class DarkTowerStates {
             const item_price = DarkTowerStates.price.get(item);
             dt.bazaar[item] = Math.floor(Math.random() * (item_price.max - item_price.min +1)) + item_price.min;
         }
+        dt.bazaar_qty = 0;
         return {
             name: "bazaar",
             keys: "000000000000",
@@ -217,7 +218,6 @@ class DarkTowerStates {
 
     static bazaar_warriors(player, dt) {
         dt.bazaar_item = "warriors";
-        dt.bazaar_qty = 0;
         return {
             output: dt.bazaar.warriors.toString().padStart(2, "0"),
             img: dt.media.image.warrior,
@@ -232,7 +232,6 @@ class DarkTowerStates {
 
     static bazaar_food(player, dt) {
         dt.bazaar_item = "food";
-        dt.bazaar_qty = 0;
         let clear;
         if (dt.bazaar.beast) clear = "bazaar_beast";
         else if (dt.bazaar.scout) clear = "bazaar_scout";
@@ -262,7 +261,7 @@ class DarkTowerStates {
             img: dt.media.image.beast,
             keys: "110101000000",
             state: {
-                yes: "bazaar_buy",
+                yes: "bazaar_sale",
                 repeat: "bazaar_warriors",
                 haggle: "bazaar_haggle",
                 clear
@@ -280,7 +279,7 @@ class DarkTowerStates {
             img: dt.media.image.scout,
             keys: "110101000000",
             state: {
-                yes: "bazaar_buy",
+                yes: "bazaar_sale",
                 repeat: "bazaar_warriors",
                 haggle: "bazaar_haggle",
                 clear
@@ -295,7 +294,7 @@ class DarkTowerStates {
             img: dt.media.image.healer,
             keys: "110101000000",
             state: {
-                yes: "bazaar_buy",
+                yes: "bazaar_sale",
                 repeat: "bazaar_warriors",
                 haggle: "bazaar_haggle",
                 clear: "bazaar_warriors"
@@ -305,6 +304,41 @@ class DarkTowerStates {
 
     static bazaar_buy(player, dt) {
         const item = dt.bazaar_item;
+        let img;
+        if (item === "warriors") img = dt.media.image.warrior;
+        else img = dt.media.image[item];
+        return {
+            output: (++dt.bazaar_qty).toString().padStart(2, "0"),
+            img,
+            keys: "101000000000",
+            state: {
+                yes: "bazaar_buy",
+                no: "bazaar_sale"
+            }
+        };
+    }
+
+    static bazaar_sale(player, dt) {
+        const item = dt.bazaar_item;
+        let gold = player.inventory.get("gold");
+        gold -= dt.bazaar[item];
+        if (gold < 0) return DarkTowerStates.bazaar_closed(player, dt);
+        player.inventory.set("gold", gold);
+        if (["beast", "scout", "healer"].includes(item)) player.inventory.set(item, true);
+        else {
+            let old_qty = player.inventory.get(item);
+            player.inventory.set(item, old_qty + dt.bazaar_qty);
+        }
+        return {
+            name: "bazaar_sale",
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            audio: dt.media.audio.beep,
+            keys: "001000000000",
+            state: {
+                no: "endTurn"
+            }
+        };
     }
 
     static bazaar_haggle(player, dt) {
