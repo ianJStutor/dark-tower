@@ -1,4 +1,4 @@
-const isDev = true;
+const isDev = false;
 
 class DarkTowerGame {
     constructor() {
@@ -182,19 +182,146 @@ class DarkTowerStates {
         };
     }
 
-    static bazaar(player) {
+    static bazaar(player, dt) {
+        player.location = "bazaar";
+        dt.bazaar = {
+            warrior: Math.floor(Math.random() * 7) + 4,
+            food: 1
+        };
+        const extras = ["beast", "scout", "healer"].filter(i => !player.inventory.get(i));
+        const rand = Math.floor(Math.random() * (extras.length + 1));
+        console.log(extras, rand, rand < extras.length);
+        if (rand < extras.length) dt.bazaar[extras[rand]] = Math.floor(Math.random() * 6) + 15;
         return {
-            name: "bazaar"
+            name: "bazaar",
+            keys: "000000000000",
+            audio: dt.media.audio.bazaar,
+            audioThen: {
+                redirect: "bazaar_warriors"
+            }
+        };
+    }
+
+    static bazaar_warriors(player, dt) {
+        dt.bazaar_item = "warrior";
+        dt.bazaar_qty = 0;
+        return {
+            output: dt.bazaar.warrior.toString().padStart(2, "0"),
+            img: dt.media.image.warrior,
+            keys: "100101000000",
+            state: {
+                yes: "bazaar_buy",
+                haggle: "bazaar_haggle",
+                clear: "bazaar_food"
+            }
+        };
+    }
+
+    static bazaar_food(player, dt) {
+        dt.bazaar_item = "food";
+        dt.bazaar_qty = 0;
+        let clear;
+        if (dt.bazaar.beast) clear = "bazaar_beast";
+        else if (dt.bazaar.scout) clear = "bazaar_scout";
+        else if (dt.bazaar.healer) clear = "bazaar_healer";
+        else clear = "bazaar_warriors";
+        return {
+            output: dt.bazaar.food.toString().padStart(2, "0"),
+            img: dt.media.image.food,
+            keys: "110101000000",
+            state: {
+                yes: "bazaar_buy",
+                repeat: "bazaar_warriors",
+                haggle: "bazaar_closed",
+                clear
+            }
+        };
+    }
+
+    static bazaar_beast(player, dt) {
+        dt.bazaar_item = "beast";
+        let clear;
+        if (dt.bazaar.scout) clear = "bazaar_scout";
+        else if (dt.bazaar.healer) clear = "bazaar_healer";
+        else clear = "bazaar_warriors";
+        return {
+            output: dt.bazaar.beast.toString().padStart(2, "0"),
+            img: dt.media.image.beast,
+            keys: "110101000000",
+            state: {
+                yes: "bazaar_buy",
+                repeat: "bazaar_warriors",
+                haggle: "bazaar_haggle",
+                clear
+            }
+        };
+    }
+
+    static bazaar_scout(player, dt) {
+        dt.bazaar_item = "scout";
+        let clear;
+        if (dt.bazaar.healer) clear = "bazaar_healer";
+        else clear = "bazaar_warriors";
+        return {
+            output: dt.bazaar.scout.toString().padStart(2, "0"),
+            img: dt.media.image.scout,
+            keys: "110101000000",
+            state: {
+                yes: "bazaar_buy",
+                repeat: "bazaar_warriors",
+                haggle: "bazaar_haggle",
+                clear
+            }
+        };
+    }
+
+    static bazaar_healer(player, dt) {
+        dt.bazaar_item = "healer";
+        return {
+            output: dt.bazaar.healer.toString().padStart(2, "0"),
+            img: dt.media.image.healer,
+            keys: "110101000000",
+            state: {
+                yes: "bazaar_buy",
+                repeat: "bazaar_warriors",
+                haggle: "bazaar_haggle",
+                clear: "bazaar_warriors"
+            }
+        };
+    }
+
+    static bazaar_buy(player, dt) {
+
+    }
+
+    static bazaar_haggle(player, dt) {
+
+    }
+
+    static bazaar_closed(player, dt) {
+        return {
+            img: dt.media.image.bazaar,
+            audio: dt.media.audio.bazaar_closed,
+            keys: "000000000000",
+            audioThen: {
+                img: dt.media.image.bazaar,
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            }
         };
     }
 
     static tomb(player) {
+        player.location = "tomb";
         return {
             name: "tomb"
         };
     }
 
     static move(player) {
+        player.location = "move";
         return {
             name: "move"
         };
