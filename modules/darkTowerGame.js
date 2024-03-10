@@ -17,7 +17,7 @@ class DarkTowerGame {
             name,
             inventory: new Map([
                 ["gold", 30],
-                ["food", 25],
+                ["food", 26],
                 ["warriors", 10],
                 ["beast", isDev],
                 ["scout", isDev],
@@ -69,9 +69,106 @@ class DarkTowerGame {
 };
 
 class DarkTowerStates {
-    static start(player) {
+    static eat = new Map([
+        [[1,15], 1],
+        [[16,30], 2],
+        [[31,45], 3],
+        [[46,60], 4],
+        [[61,75], 5],
+        [[76,90], 6],
+        [[91,99], 7]
+    ]);
+
+    static start(player, dt) {
+        let [ warriors, food, gold ] = ["warriors", "food", "gold"].map(i => player.inventory.get(i));
+        let toEat;
+        DarkTowerStates.eat.forEach((v,k) => {
+            if (warriors >= k[0] && warriors <= k[1]) toEat = v;
+        });
+        food -= toEat;
+        if (food < 0) {
+            food = 0;
+            warriors = Math.ceil(warriors*0.75);
+            let carryingCapacity = warriors * 6;
+            if (player.inventory.get("beast")) carryingCapacity += 50;
+            if (gold > carryingCapacity) gold = carryingCapacity;
+            player.inventory.set("warriors", warriors);
+            player.inventory.set("food", food);
+            player.inventory.set("gold", gold);
+            return DarkTowerStates.starve_food(player, dt);
+        }
+        player.inventory.set("food", food);
+        if (food < toEat * 4) return DarkTowerStates.foodWarning(player, dt);
+        return DarkTowerStates.menu(player, dt);
+    }
+
+    static foodWarning(player, dt) {
         return {
-            name: "start",
+            name: "foodWarning",
+            output: player.inventory.get("food").toString().padStart(2, "0"),
+            img: dt.media.image.food,
+            keys: "000000000000",
+            audio: dt.media.audio.starving,
+            audioThen: {
+                keys: "000001000000",
+                output: player.inventory.get("food").toString().padStart(2, "0"),
+                img: dt.media.image.food,
+                state: {
+                    clear: "menu"
+                }
+            }
+        };
+    }
+
+    static starve_food(player, dt) {
+        return {
+            name: "starve_food",
+            output: player.inventory.get("food").toString().padStart(2, "0"),
+            img: dt.media.image.food,
+            audio: dt.media.audio.plague,
+            keys: "000000000000",
+            audioThen: {
+                output: player.inventory.get("food").toString().padStart(2, "0"),
+                img: dt.media.image.food,
+                keys: "100001000000",
+                state: {
+                    yes: "starve_warriors",
+                    clear: "menu"
+                }
+            }
+        };
+    }
+
+    static starve_warriors(player, dt) {
+        return {
+            name: "starve_warriors",
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
+            img: dt.media.image.warriors,
+            keys: "110001000000",
+            state: {
+                yes: "starve_gold",
+                repeat: "starve_food",
+                clear: "menu"
+            }
+        };
+    }
+
+    static starve_gold(player, dt) {
+        return {
+            name: "starve_gold",
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            keys: "010001000000",
+            state: {
+                repeat: "starve_food",
+                clear: "menu"
+            }
+        };
+    }
+
+    static menu(player) {
+        return {
+            name: "menu",
             keys: "000010111111",
             state: {
                 bazaar: "bazaar",
@@ -120,7 +217,7 @@ class DarkTowerStates {
                     img: dt.media.image.keymissing,
                     keys: "000001000000",
                     state: {
-                        clear: "start"
+                        clear: "menu"
                     }
                 }
             };
@@ -234,6 +331,7 @@ class DarkTowerStates {
             keys: "000000000000",
             audio: dt.media.audio.intro,
             audioThen: {
+                img: dt.media.image.victory,
                 keys: "001000000000",
                 state: {
                     no: "endGame"
@@ -265,7 +363,7 @@ class DarkTowerStates {
                     img: dt.media.image.keymissing,
                     keys: "000001000000",
                     state: {
-                        clear: "start"
+                        clear: "menu"
                     }
                 }
             }
@@ -283,11 +381,11 @@ class DarkTowerStates {
         return {
             name: "inventory_warriors",
             keys: "100001000000",
-            output: player.inventory.get("warriors"),
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
             img: dt.media.image.warriors,
             state: {
                 yes: "inventory_gold",
-                clear: "start"
+                clear: "menu"
             }
         };
     }
@@ -296,12 +394,12 @@ class DarkTowerStates {
         return {
             name: "inventory_gold",
             keys: "110001000000",
-            output: player.inventory.get("gold"),
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
             img: dt.media.image.gold,
             state: {
                 yes: "inventory_food",
                 repeat: "inventory_warriors",
-                clear: "start"
+                clear: "menu"
             }
         };
     }
@@ -310,7 +408,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "beast",
@@ -331,7 +429,7 @@ class DarkTowerStates {
         return {
             name: "inventory_food",
             keys,
-            output: player.inventory.get("food"),
+            output: player.inventory.get("food").toString().padStart(2, "0"),
             img: dt.media.image.food,
             state
         };
@@ -341,7 +439,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "scout",
@@ -371,7 +469,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "healer",
@@ -400,7 +498,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "sword",
@@ -428,7 +526,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "wizard",
@@ -455,7 +553,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "brassKey",
@@ -481,7 +579,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "silverKey",
@@ -506,7 +604,7 @@ class DarkTowerStates {
         let keys = "110001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         let yes = [
             "goldKey"
@@ -530,7 +628,7 @@ class DarkTowerStates {
         let keys = "010001000000";
         let state = {
             repeat: "inventory_warriors",
-            clear: "start"
+            clear: "menu"
         };
         return {
             name: "inventory_silverKey",
@@ -558,7 +656,7 @@ class DarkTowerStates {
     static battle_brigands(player, dt) {
         return {
             name: "battle_brigands",
-            output: dt.brigands,
+            output: dt.brigands.toString().padStart(2, "0"),
             img: dt.media.image.brigands,
             keys: "001000000000",
             state: {
@@ -581,7 +679,7 @@ class DarkTowerStates {
         }
         return {
             name: "battle_warriors",
-            output: player.inventory.get("warriors"),
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
             img: dt.media.image.warriors,
             keys: "001000000000",
             state: {
@@ -607,7 +705,7 @@ class DarkTowerStates {
             player.inventory.set("warriors", warriors-1);
             if (player.inventory.get("warriors") <= 0) {
                 player.inventory.set("warriors", 1);
-                return DarkTowerStates.darkTower_escape(player, dt);
+                return DarkTowerStates.battle_escape(player, dt);
             }
             audio = dt.media.audio.player_hit;
         }
@@ -627,12 +725,12 @@ class DarkTowerStates {
     static battle_escape(player, dt) {
         return {
             name: "battle_escape",
-            output: player.inventory.get("warriors"),
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
             img: dt.media.image.warriors,
             keys: "000000000000",
             audio: dt.media.audio.plague,
             audioThen: {
-                output: player.inventory.get("warriors"),
+                output: player.inventory.get("warriors").toString().padStart(2, "0"),
                 img: dt.media.image.warriors,
                 keys: "001000000000",
                 state: {
