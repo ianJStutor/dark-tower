@@ -332,41 +332,48 @@
             const figure = document.querySelector("figure");
             //state
             player.turnState = [];
-            function takeTurn(newState) {
+            function changeState(newState) {
                 if (newState === "endTurn") {
                     dt.media.audio.end_turn.play();
                     dt.nextPlayer();
                     dt.loadScreen("playerTurn");
                     return;
                 }
+                if (newState === "endGame") return dt.loadScreen("splash");
                 if (newState) player.turnState.push(newState);
                 const turn = dt.turn(player);
-                if (turn.output) output.textContent = turn.output;
-                else output.textContent = "";
-                if (turn.img) figure.replaceChildren(turn.img);
-                else figure.replaceChildren();
-                if (turn.audio) {
-                    if (turn.audioThen) {
-                        turn.audio.addEventListener("ended", () => {
-                            if (turn.audioThen.audio) turn.audioThen.audio.play();
-                            if (turn.audioThen.img) figure.replaceChildren(turn.audioThen.img);
-                            if (turn.audioThen.keys) assignKeys(turn.audioThen.keys, turn.state);
-                        }, { once: true });
+                takeTurn(turn);
+
+                function takeTurn(turn) {
+                    if (turn.redirect) return changeState(turn.redirect);
+                    if (turn.output) output.textContent = turn.output;
+                    else output.textContent = "";
+                    if (turn.img) figure.replaceChildren(turn.img);
+                    else figure.replaceChildren();
+                    if (turn.keys) assignKeys(turn.keys, turn.state);
+                    if (turn.audio) {
+                        if (turn.audioThen) {
+                            turn.audio.addEventListener("ended", () => {
+                                takeTurn(turn.audioThen);
+                            }, { once: true });
+                        }
+                        turn.audio.play();
                     }
-                    turn.audio.play();
+                    if (turn.delayThen) {
+                        setTimeout(() => takeTurn(turn.delayThen), turn.delay);
+                    }
+                    turn.player = player;
+                    console.log(turn);
                 }
-                assignKeys(turn.keys, turn.state);
-                turn.player = player;
-                console.log(turn);
             }
-            function assignKeys(turnKeys, state) {
+            function assignKeys(turnKeys, state = {}) {
                 keys.forEach((b,i) => {
                     if (Boolean(Number(turnKeys[i]))) {
                         b.removeAttribute("disabled");
                         b.onclick = () => {
                             dt.media.audio.click.play();
                             const newState = state[b.id];
-                            if (newState) takeTurn(newState);
+                            if (newState) changeState(newState);
                         }
                     }
                     else {
@@ -375,9 +382,8 @@
                     }
                 });
             }
-            //events
             //start
-            takeTurn();
+            changeState();
         }
         </script>
     </template>

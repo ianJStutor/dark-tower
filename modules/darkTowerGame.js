@@ -1,3 +1,5 @@
+const isDev = true;
+
 class DarkTowerGame {
     constructor() {
         this.media = {};
@@ -17,14 +19,14 @@ class DarkTowerGame {
                 ["gold", 30],
                 ["food", 25],
                 ["warriors", 10],
-                ["beast", false],
-                ["scout", false],
-                ["healer", false],
-                ["sword", false],
-                ["wizard", false],
-                ["brassKey", false],
-                ["silverKey", false],
-                ["goldKey", false]
+                ["beast", isDev],
+                ["scout", isDev],
+                ["healer", isDev],
+                ["sword", isDev],
+                ["wizard", isDev],
+                ["brassKey", isDev],
+                ["silverKey", isDev],
+                ["goldKey", isDev]
             ]),
             chance_move: new Map([
                 ["safe", 1],
@@ -136,9 +138,9 @@ class DarkTowerStates {
             audio: dt.media.audio.darktower,
             audioThen: {
                 keys: "101000000000",
+                state,
                 img: dt.media.image[dt.keyGuess[0].toLowerCase()]
-            },
-            state
+            }
         };
     }
 
@@ -207,17 +209,121 @@ class DarkTowerStates {
             keys: "000000000000",
             audio: dt.media.audio.player_hit,
             audioThen: {
-                keys: "001000000000"
-            },
-            state: {
-                no: "endTurn"
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
             }
         };
     }
 
     static darkTower_battle(player, dt) {
+        dt.brigands = Math.ceil(Math.random() * 10) + 30;
         return {
-            output: "dark tower battle"
+            name: "darkTower_battle",
+            keys: "000000000000",
+            audio: dt.media.audio.enemy_hit,
+            audioThen: {
+                audio: dt.media.audio.enemy_hit,
+                audioThen: {
+                    redirect: "darkTower_brigands"
+                }
+            }
+        };
+    }
+
+    static darkTower_brigands(player, dt) {
+        return {
+            name: "darkTower_brigands",
+            output: dt.brigands,
+            img: dt.media.image.brigands,
+            keys: "001000000000",
+            state: {
+                no: "darkTower_escape"
+            },
+            audio: dt.media.audio.click,
+            delay: 1500,
+            delayThen: {
+                redirect: "darkTower_warriors"
+            }
+        };
+    }
+
+    static darkTower_warriors(player, dt) {
+        if (dt.brigands <= 0) return DarkTowerStates.darkTower_victory(player, dt);
+        return {
+            name: "darkTower_warriors",
+            output: player.inventory.get("warriors"),
+            img: dt.media.image.warriors,
+            keys: "001000000000",
+            state: {
+                no: "darkTower_escape"
+            },
+            audio: dt.media.audio.click,
+            delay: 1500,
+            delayThen: {
+                redirect: "darkTower_battle_result"
+            }
+        };
+    }
+
+    static darkTower_battle_result(player, dt) {
+        const warriors = player.inventory.get("warriors");
+        const winChance = warriors / (warriors + dt.brigands);
+        let audio;
+        if (Math.random() < winChance) {
+            audio = dt.media.audio.enemy_hit;
+            dt.brigands = Math.floor(dt.brigands/2);
+        }
+        else {
+            player.inventory.set("warriors", warriors-1);
+            if (player.inventory.get("warriors") <= 0) {
+                player.inventory.set("warriors", 1);
+                return DarkTowerStates.darkTower_escape(player, dt);
+            }
+            audio = dt.media.audio.player_hit;
+        }
+        return {
+            name: "darkTower_battle_result",
+            keys: "001000000000",
+            state: {
+                no: "darkTower_escape"
+            },
+            audio,
+            audioThen: {
+                redirect: "darkTower_brigands"
+            }
+        };
+    }
+
+    static darkTower_escape(player, dt) {
+        return {
+            name: "darkTower_escape",
+            output: player.inventory.get("warriors"),
+            img: dt.media.image.warriors,
+            keys: "000000000000",
+            audio: dt.media.audio.plague,
+            audioThen: {
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            }
+        };
+    }
+
+    static darkTower_victory(player, dt) {
+        return {
+            name: "darkTower_victory",
+            img: dt.media.image.victory,
+            keys: "000000000000",
+            audio: dt.media.audio.intro,
+            audioThen: {
+                keys: "001000000000",
+                state: {
+                    no: "endGame"
+                }
+            }
         };
     }
 
@@ -229,10 +335,10 @@ class DarkTowerStates {
         const success = Object.assign({
             keys: "000000000000",
             audioThen: {
-                keys: "001000000000"
-            },
-            state: {
-                no: "endTurn"
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
             }
         }, ret);
         const noKey = Object.assign({
@@ -240,14 +346,14 @@ class DarkTowerStates {
             audioThen: {
                 audio: dt.media.audio.player_hit,
                 img: dt.media.image.keymissing,
-                keys: "000001000000"
-            },
-            state: {
-                clear: "start"
+                keys: "000001000000",
+                state: {
+                    clear: "start"
+                }
             }
         }, ret);
         const keyNeeded = ["", "brassKey", "silverKey", "goldKey"];
-        const key = keyNeeded[player.frontier];console.log(key, key.length, !key.length);
+        const key = keyNeeded[player.frontier];
         if (!key.length || player.inventory.get(key)) {
             player.frontier++;
             return success;
