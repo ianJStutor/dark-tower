@@ -200,9 +200,75 @@ class DarkTowerStates {
         };
     }
 
-    static sanctuary(player) {
+    static sanctuary(player, dt) {
+        if (player.frontier === 4 && ["brassKey", "silverKey", "goldKey"].every(key => player.inventory.get(key)) && player.location !== "sanctuary") {
+            //home citadel, all keys
+            let warriors = player.inventory.get("warriors");
+            if (warriors >= 5 && warriors <= 24) {
+                player.inventory.set("warriors", warriors * 2);
+            }
+        }
+        player.location = "sanctuary";
+        let [ warriors, food, gold ] = ["warriors", "food", "gold"].map(i => player.inventory.get(i));
+        if (warriors <= 4) {
+            warriors += Math.floor(Math.random() * 6) + 1;
+            player.inventory.set("warriors", warriors);
+        }
+        if (food <= 5) {
+            food += Math.floor(Math.random() * 6) + 4;
+            player.inventory.set("food", food);
+        }
+        if (gold <= 7) {
+            gold += Math.floor(Math.random() * 10) + 5;
+            player.inventory.set("gold", gold);
+        }
         return {
-            name: "sanctuary"
+            name: "sanctuary",
+            audio: dt.media.audio.sanctuary,
+            keys: "000000000000",
+            audioThen: {
+                redirect: "sanctuary_warriors"
+            }
+        };
+    }
+
+    static sanctuary_warriors(player, dt) {
+        return {
+            name: "sanctuary_warriors",            
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
+            img: dt.media.image.warriors,
+            keys: "101000000000",
+            state: {
+                yes: "sanctuary_food",
+                no: "endTurn"
+            }
+        };
+    }
+
+    static sanctuary_food(player, dt) {
+        return {
+            name: "sanctuary_food",
+            output: player.inventory.get("food").toString().padStart(2, "0"),
+            img: dt.media.image.food,
+            keys: "111000000000",
+            state: {
+                yes: "sanctuary_gold",
+                repeat: "sanctuary_warriors",
+                no: "endTurn"
+            }
+        };
+    }
+
+    static sanctuary_gold(player, dt) {
+        return {
+            name: "sanctuary_gold",
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            keys: "011000000000",
+            state: {
+                repeat: "sanctuary_warriors",
+                no: "endTurn"
+            }
         };
     }
 
@@ -222,6 +288,7 @@ class DarkTowerStates {
                 }
             };
         }
+        player.location = "darkTower";
         dt.keyGuess = ["brassKey", "silverKey", "goldKey"].sort(() => Math.random() - 0.5);
         if (!dt.lock.length) dt.lock = dt.keyGuess.toSorted(() => Math.random() - 0.5);
         let state;
@@ -320,7 +387,6 @@ class DarkTowerStates {
 
     static darkTower_battle(player, dt) {
         dt.brigands = Math.ceil(Math.random() * 10) + 30;
-        player.location = "darkTower";
         return DarkTowerStates.battle(player, dt);
     }
 
@@ -371,6 +437,7 @@ class DarkTowerStates {
         const keyNeeded = ["", "brassKey", "silverKey", "goldKey"];
         const key = keyNeeded[player.frontier];
         if (key === "" || player.inventory.get(key)) {
+            player.location = "frontier";
             player.frontier++;
             return success;
         }
