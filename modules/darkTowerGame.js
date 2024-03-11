@@ -334,8 +334,8 @@ class DarkTowerStates {
 
     static bazaar_sale(player, dt) {
         const item = dt.bazaar_item;
-        let gold = player.inventory.get("gold");console.log("gold before", gold);
-        gold -= dt.bazaar[item] * dt.bazaar_qty;console.log("gold after", gold);
+        let gold = player.inventory.get("gold");
+        gold -= dt.bazaar[item] * dt.bazaar_qty;
         if (gold < 0) return DarkTowerStates.bazaar_closed(player, dt);
         player.inventory.set("gold", gold);
         if (["beast", "scout", "healer"].includes(item)) player.inventory.set(item, true);
@@ -467,49 +467,49 @@ class DarkTowerStates {
             case "safe":
                 player.chance_move.set("safe", 0.5);
                 player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
-                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
-                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
-                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
-                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.1);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.05);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.05);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.01);
                 return DarkTowerStates.move_safe(player, dt);
             case "lost":
                 player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
                 player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
                 player.chance_move.set("lost", 0);
-                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
-                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
-                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.05);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.05);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.01);
                 return DarkTowerStates.move_lost(player, dt);
             case "battle":
                 player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
                 player.chance_move.set("battle", 0.75);
-                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
-                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
-                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
-                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.1);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.05);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.05);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.01);
                 return DarkTowerStates.move_battle(player, dt);
             case "dragon":
                 player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
                 player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
-                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.1);
                 player.chance_move.set("dragon", 0);
-                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
-                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.05);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.01);
                 return DarkTowerStates.move_dragon(player, dt);
             case "plague":
                 player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
                 player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
-                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
-                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.1);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.05);
                 player.chance_move.set("plague", 0);
-                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.01);
                 return DarkTowerStates.move_plague(player, dt);
             case "cursed":
                 player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
                 player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
-                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
-                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
-                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.1);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.05);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.05);
                 player.chance_move.set("cursed", 0);
                 return DarkTowerStates.move_cursed(player, dt);
         }
@@ -1331,10 +1331,11 @@ class DarkTowerStates {
             dt.brigands = Math.floor(dt.brigands/2);
         }
         else {
-            player.inventory.set("warriors", Math.max(1, warriors-1));
+            player.inventory.set("warriors", warriors-1);
             const carry = player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0);
             player.inventory.set("gold", Math.min(carry, player.inventory.get("gold")));
             if (player.inventory.get("warriors") <= 0) {
+                player.inventory.set("warriors", 1);
                 return DarkTowerStates.battle_escape(player, dt);
             }
             audio = dt.media.audio.player_hit;
