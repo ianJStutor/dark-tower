@@ -333,7 +333,7 @@
             //state
             let timer = null;
             player.turnState = [];
-            function changeState(newState) {
+            async function changeState(newState) {
                 if (newState === "endTurn") {
                     dt.media.audio.end_turn.play();
                     dt.nextPlayer();
