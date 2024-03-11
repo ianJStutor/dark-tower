@@ -215,7 +215,6 @@ class DarkTowerStates {
             const item_price = DarkTowerStates.price.get(item);
             dt.bazaar[item] = Math.floor(Math.random() * (item_price.max - item_price.min +1)) + item_price.min;
         }
-        dt.bazaar_qty = 0;
         return {
             name: "bazaar",
             keys: "000000000000",
@@ -228,6 +227,7 @@ class DarkTowerStates {
 
     static bazaar_warriors(player, dt) {
         dt.bazaar_item = "warriors";
+        dt.bazaar_qty = 0;
         return {
             output: dt.bazaar.warriors.toString().padStart(2, "0"),
             img: dt.media.image.warrior,
@@ -242,6 +242,7 @@ class DarkTowerStates {
 
     static bazaar_food(player, dt) {
         dt.bazaar_item = "food";
+        dt.bazaar_qty = 0;
         let bazaar;
         if (dt.bazaar.beast) bazaar = "bazaar_beast";
         else if (dt.bazaar.scout) bazaar = "bazaar_scout";
@@ -262,6 +263,7 @@ class DarkTowerStates {
 
     static bazaar_beast(player, dt) {
         dt.bazaar_item = "beast";
+        dt.bazaar_qty = 1;
         let bazaar;
         if (dt.bazaar.scout) bazaar = "bazaar_scout";
         else if (dt.bazaar.healer) bazaar = "bazaar_healer";
@@ -281,6 +283,7 @@ class DarkTowerStates {
 
     static bazaar_scout(player, dt) {
         dt.bazaar_item = "scout";
+        dt.bazaar_qty = 1;
         let bazaar;
         if (dt.bazaar.healer) bazaar = "bazaar_healer";
         else bazaar = "bazaar_warriors";
@@ -299,6 +302,7 @@ class DarkTowerStates {
 
     static bazaar_healer(player, dt) {
         dt.bazaar_item = "healer";
+        dt.bazaar_qty = 1;
         return {
             output: dt.bazaar.healer.toString().padStart(2, "0"),
             img: dt.media.image.healer,
@@ -330,8 +334,8 @@ class DarkTowerStates {
 
     static bazaar_sale(player, dt) {
         const item = dt.bazaar_item;
-        let gold = player.inventory.get("gold");
-        gold -= dt.bazaar[item];
+        let gold = player.inventory.get("gold");console.log("gold before", gold);
+        gold -= dt.bazaar[item] * dt.bazaar_qty;console.log("gold after", gold);
         if (gold < 0) return DarkTowerStates.bazaar_closed(player, dt);
         player.inventory.set("gold", gold);
         if (["beast", "scout", "healer"].includes(item)) player.inventory.set(item, true);
@@ -699,11 +703,11 @@ class DarkTowerStates {
     static inventory_warriors(player, dt) {
         return {
             name: "inventory_warriors",
-            keys: "100001000000",
+            keys: "000001000001",
             output: player.inventory.get("warriors").toString().padStart(2, "0"),
             img: dt.media.image.warriors,
             state: {
-                yes: "inventory_gold",
+                inventory: "inventory_gold",
                 clear: "menu"
             }
         };
@@ -712,11 +716,11 @@ class DarkTowerStates {
     static inventory_gold(player, dt) {
         return {
             name: "inventory_gold",
-            keys: "110001000000",
+            keys: "010001000001",
             output: player.inventory.get("gold").toString().padStart(2, "0"),
             img: dt.media.image.gold,
             state: {
-                yes: "inventory_food",
+                inventory: "inventory_food",
                 repeat: "inventory_warriors",
                 clear: "menu"
             }
@@ -724,7 +728,7 @@ class DarkTowerStates {
     }
 
     static inventory_food(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -740,7 +744,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -755,7 +759,7 @@ class DarkTowerStates {
     }
 
     static inventory_beast(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -770,7 +774,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -785,7 +789,7 @@ class DarkTowerStates {
     }
 
     static inventory_scout(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -799,7 +803,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -814,7 +818,7 @@ class DarkTowerStates {
     }
 
     static inventory_healer(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -827,7 +831,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -842,7 +846,7 @@ class DarkTowerStates {
     }
 
     static inventory_sword(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -854,7 +858,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -869,7 +873,7 @@ class DarkTowerStates {
     }
 
     static inventory_wizard(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -880,7 +884,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -895,7 +899,7 @@ class DarkTowerStates {
     }
 
     static inventory_brassKey(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -905,7 +909,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -920,7 +924,7 @@ class DarkTowerStates {
     }
 
     static inventory_silverKey(player, dt) {
-        let keys = "110001000000";
+        let keys = "010001000001";
         let state = {
             repeat: "inventory_warriors",
             clear: "menu"
@@ -929,7 +933,7 @@ class DarkTowerStates {
             "goldKey"
         ].find(item => Boolean(player.inventory.get(item)));
         if (yes) {
-            state.yes = `inventory_${yes}`;
+            state.inventory = `inventory_${yes}`;
         }
         else {
             keys = "010001000000";
@@ -972,7 +976,7 @@ class DarkTowerStates {
         return {
             name: "battle",
             keys: "000000000000",
-            audio,
+            audio: dt.media.audio.enemy_hit,
             audioThen: {
                 audio: dt.media.audio.enemy_hit,
                 audioThen: {
@@ -1228,6 +1232,8 @@ class DarkTowerStates {
         player.inventory.set("gold", newGold);
         return {
             name: "move_treasure",
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
             audio: dt.media.audio.beep,
             keys: "001000000000",
             state: {
