@@ -1,5 +1,3 @@
-const isDev = false;
-
 class DarkTowerGame {
     constructor() {
         this.media = {};
@@ -19,14 +17,14 @@ class DarkTowerGame {
                 ["gold", 30],
                 ["food", 26],
                 ["warriors", 10],
-                ["beast", isDev],
-                ["scout", isDev],
-                ["healer", isDev],
-                ["sword", isDev],
-                ["wizard", isDev],
-                ["brassKey", isDev],
-                ["silverKey", isDev],
-                ["goldKey", isDev]
+                ["beast", false],
+                ["scout", false],
+                ["healer", false],
+                ["sword", false],
+                ["wizard", false],
+                ["brassKey", false],
+                ["silverKey", false],
+                ["goldKey", false]
             ]),
             chance_move: new Map([
                 ["safe", 1],
@@ -42,7 +40,7 @@ class DarkTowerGame {
                 ["treasure", 0]
             ]),
             chance_treasure: new Map([
-                ["gold", 1],
+                ["nothing", 1],
                 ["key", 0],
                 ["sword", 0],
                 ["wizard", 0],
@@ -85,6 +83,18 @@ class DarkTowerStates {
         ["beast", { min: 15, max: 20 }],
         ["scout", { min: 15, max: 20 }],
         ["healer", { min: 15, max: 20 }]
+    ]);
+
+    static brigands = new Map([
+        ["move", { min: 5, max: 15}],
+        ["tomb", { min: 15, max: 30}],
+        ["darkTower", { min: 30, max: 50}]
+    ]);
+
+    static gold = new Map([
+        ["move", { min: 15, max: 30 }],
+        ["tomb", { min: 25, max: 40 }],
+        ["dragon", { min: 30, max: 50 }]
     ]);
 
     static start(player, dt) {
@@ -367,14 +377,73 @@ class DarkTowerStates {
         };
     }
 
-    static tomb(player) {
+    static tomb(player, dt) {
         player.location = "tomb";
+        const chances = {};
+        const sum = [...player.chance_tomb.values()].reduce((a,b) => a+b, 0);
+        player.chance_tomb.forEach((v,k) => {
+            chances[k] = v/sum;
+        });
+        let rand = Math.random();
+        let event;
+        for (let key in chances) {
+            if (rand < chances[key]) {
+                event = key;
+                break;
+            }
+            rand -= chances[key];
+        }
+        switch (event) {
+            case "empty":
+                player.chance_tomb.set("empty", 0);
+                player.chance_tomb.set("battle", player.chance_tomb.get("battle")+1);
+                player.chance_tomb.set("treasure", player.chance_tomb.get("treasure")+0.25);
+                return DarkTowerStates.tomb_empty(player, dt);
+            case "treasure":
+                player.chance_tomb.set("empty", player.chance_tomb.get("empty")+0.5);
+                player.chance_tomb.set("battle", player.chance_tomb.get("battle")+1);
+                player.chance_tomb.set("treasure", 0);
+                return DarkTowerStates.tomb_empty_treasure(player, dt);
+            case "battle":
+                player.chance_tomb.set("empty", player.chance_tomb.get("empty")+0.5);
+                player.chance_tomb.set("battle", 1);
+                player.chance_tomb.set("treasure", player.chance_tomb.get("treasure")+0.25);
+                return DarkTowerStates.tomb_battle(player, dt);
+        }
+    }
+
+    static tomb_empty(player, dt) {
         return {
-            name: "tomb"
+            name: "tomb_empty",
+            keys: "000000000000",
+            audio: dt.media.audio.tomb_nothing,
+            audioThen: {
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            }
         };
     }
 
-    static move(player) {
+    static tomb_empty_treasure(player, dt) {
+        return {
+            name: "tomb_empty_treasure",
+            keys: "000000000000",
+            audio: dt.media.audio.tomb_nothing,
+            audioThen: {
+                redirect: "move_treasure"
+            }
+        };
+    }
+
+    static tomb_battle(player, dt) {
+        const { min, max } = DarkTowerStates.brigands.get("tomb");
+        dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
+        return DarkTowerStates.battle(player, dt);
+    }
+
+    static move(player, dt) {
         player.location = "move";
         return {
             name: "move"
@@ -567,7 +636,8 @@ class DarkTowerStates {
     }
 
     static darkTower_battle(player, dt) {
-        dt.brigands = Math.ceil(Math.random() * 10) + 30;
+        const { min, max } = DarkTowerStates.brigands.get("darkTower");
+        dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
         return DarkTowerStates.battle(player, dt);
     }
 
@@ -620,6 +690,7 @@ class DarkTowerStates {
         if (key === "" || player.inventory.get(key)) {
             player.location = "frontier";
             player.frontier++;
+            if (player.frontier < 4) player.chance_treasure.set("key", 2);
             return success;
         }
         return noKey;
@@ -888,10 +959,20 @@ class DarkTowerStates {
     }
 
     static battle(player, dt) {
+        if (player.location === "tomb") {
+            return {
+                name: "battle",
+                audio: dt.media.audio.tomb_battle,
+                keys: "000000000000",
+                audioThen: {
+                    redirect: "battle_brigands"
+                }
+            };
+        }
         return {
             name: "battle",
             keys: "000000000000",
-            audio: dt.media.audio.enemy_hit,
+            audio,
             audioThen: {
                 audio: dt.media.audio.enemy_hit,
                 audioThen: {
@@ -923,7 +1004,10 @@ class DarkTowerStates {
             if (player.location === "darkTower") {
                 return DarkTowerStates.darkTower_victory(player, dt);
             }
-            return DarkTowerStates.battle_treasure(player, dt);
+            if (player.location === "tomb") {
+                return DarkTowerStates.tomb_treasure(player, dt);
+            }
+            return DarkTowerStates.move_treasure(player, dt);
         }
         return {
             name: "battle_warriors",
@@ -984,6 +1068,170 @@ class DarkTowerStates {
                 state: {
                     no: "endTurn"
                 }
+            }
+        };
+    }
+
+    static tomb_treasure(player, dt) {
+        //gold
+        const { min, max } = DarkTowerStates.gold.get("tomb");
+        const gold = Math.ceil(Math.random() * (max - min +1)) + min;
+        const newGold = Math.min(
+            Math.min(player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0), 99),
+            player.inventory.get("gold") + gold
+        );
+        player.inventory.set("gold", newGold);
+        //lagniappe
+        let lagniappe;
+        const chances = {};
+        const sum = [...player.chance_treasure.values()].reduce((a,b) => a+b, 0);
+        if (sum > 0) {
+            player.chance_treasure.forEach((v,k) => {
+                chances[k] = v/sum;
+            });
+            let rand = Math.random();
+            for (let key in chances) {
+                if (rand < chances[key]) {
+                    lagniappe = key;
+                    break;
+                }
+                rand -= chances[key];
+            }
+        }
+        //increment chances
+        if (
+            player.frontier === 1 && !player.inventory.get("brassKey") ||
+            player.frontier === 2 && !player.inventory.get("silverKey") ||
+            player.frontier === 3 && !player.inventory.get("goldKey")
+        ) player.chance_treasure.set("key", player.chance_treasure.get("key")+1);
+        if (!player.inventory.get("sword")) player.chance_treasure.set("sword", player.chance_treasure.get("sword")+0.25);
+        if (!player.inventory.get("pegasus")) player.chance_treasure.set("pegasus", player.chance_treasure.get("pegasus")+0.25);
+        if (!player.inventory.get("wizard")) player.chance_treasure.set("wizard", player.chance_treasure.get("wizard")+0.25);
+        if (lagniappe === "nothing") player.chance_treasure.set("nothing", 0);
+        else player.chance_treasure.set("nothing", player.chance_treasure.get("nothing")+0.5);
+        //return
+        if (!lagniappe || lagniappe === "nothing") return {
+            name: "tomb_treasure",
+            audio: dt.media.audio.beep,
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            keys: "001000000000",
+            state: {
+                no: "endTurn"
+            }
+        };
+        return {
+            name: "tomb_lagniappe",
+            audio: dt.media.audio.beep,
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            keys: "100000000000",
+            state: {
+                yes: `tomb_treasure_${lagniappe}`
+            }
+        };
+    }
+
+    static tomb_treasure_key(player, dt) {
+        player.chance_treasure.set("key", 0);
+        if (player.frontier === 1) {
+            player.inventory.set("brassKey", true);
+            return {
+                name: "treasure_brassKey",
+                output: "01",
+                img: dt.media.image.brasskey,
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            };
+        }
+        if (player.frontier === 2) {
+            player.inventory.set("silverKey", true);
+            return {
+                name: "treasure_silverKey",
+                output: "01",
+                img: dt.media.image.silverkey,
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            };
+        }
+        if (player.frontier === 3) {
+            player.inventory.set("goldKey", true);
+            return {
+                name: "treasure_goldKey",
+                output: "01",
+                img: dt.media.image.goldkey,
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            };
+        }
+    }
+
+    static tomb_treasure_sword(player, dt) {
+        player.inventory.set("sword", true);
+        player.chance_treasure.set("sword", 0);
+        return {
+            name: "treasure_sword",
+            output: "01",
+            img: dt.media.image.sword,
+            keys: "001000000000",
+            state: {
+                no: "endTurn"
+            }
+        };
+    }
+
+    static tomb_treasure_wizard(player, dt) {
+        player.inventory.set("wizard", true);
+        player.chance_treasure.set("wizard", 0);
+        return {
+            name: "treasure_wizard",
+            output: "01",
+            img: dt.media.image.wizard,
+            keys: "001000000000",
+            state: {
+                no: "endTurn"
+            }
+        };
+    }
+
+    static tomb_treasure_pegasus(player, dt) {
+        player.inventory.set("pegasus", true);
+        player.chance_treasure.set("pegasus", 0);
+        return {
+            name: "treasure_pegasus",
+            keys: "000000000000",
+            output: "01",
+            img: dt.media.image.pegasus,
+            audio: dt.media.audio.pegasus,
+            audioThen: {
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            }
+        };
+    }
+
+    static move_treasure(player, dt) {
+        const { min, max } = DarkTowerStates.gold.get("move");
+        const gold = Math.ceil(Math.random() * (max - min +1)) + min;
+        const newGold = Math.min(
+            Math.min(player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0), 99),
+            player.inventory.get("gold") + gold
+        );
+        player.inventory.set("gold", newGold);
+        return {
+            name: "move_treasure",
+            audio: dt.media.audio.beep,
+            keys: "001000000000",
+            state: {
+                no: "endTurn"
             }
         };
     }
