@@ -35,6 +35,7 @@ darkTowerGame.media = await loadMedia([
     { type: "audio", name: "enemy_hit", path: "./media/audio/enemy-hit.wav" },
     { type: "audio", name: "frontier", path: "./media/audio/frontier.wav" },
     { type: "audio", name: "intro", path: "./media/audio/intro.wav" },
+    { type: "audio", name: "lost", path: "./media/audio/lost.wav" },
     { type: "audio", name: "pegasus", path: "./media/audio/pegasus.wav" },
     { type: "audio", name: "plague", path: "./media/audio/plague.wav" },
     { type: "audio", name: "player_hit", path: "./media/audio/player-hit.wav" },

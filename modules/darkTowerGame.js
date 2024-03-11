@@ -148,9 +148,9 @@ class DarkTowerStates {
             audioThen: {
                 output: player.inventory.get("food").toString().padStart(2, "0"),
                 img: dt.media.image.food,
-                keys: "100001000000",
+                keys: "000001000001",
                 state: {
-                    yes: "starve_warriors",
+                    inventory: "starve_warriors",
                     clear: "menu"
                 }
             }
@@ -162,9 +162,9 @@ class DarkTowerStates {
             name: "starve_warriors",
             output: player.inventory.get("warriors").toString().padStart(2, "0"),
             img: dt.media.image.warriors,
-            keys: "110001000000",
+            keys: "010001000001",
             state: {
-                yes: "starve_gold",
+                inventory: "starve_gold",
                 repeat: "starve_food",
                 clear: "menu"
             }
@@ -449,8 +449,302 @@ class DarkTowerStates {
 
     static move(player, dt) {
         player.location = "move";
+        const chances = {};
+        const sum = [...player.chance_move.values()].reduce((a,b) => a+b, 0);
+        player.chance_move.forEach((v,k) => {
+            chances[k] = v/sum;
+        });
+        let rand = Math.random();
+        let event;
+        for (let key in chances) {
+            if (rand < chances[key]) {
+                event = key;
+                break;
+            }
+            rand -= chances[key];
+        }
+        switch (event) {
+            case "safe":
+                player.chance_move.set("safe", 0.5);
+                player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                return DarkTowerStates.move_safe(player, dt);
+            case "lost":
+                player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
+                player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
+                player.chance_move.set("lost", 0);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                return DarkTowerStates.move_lost(player, dt);
+            case "battle":
+                player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
+                player.chance_move.set("battle", 0.75);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                return DarkTowerStates.move_battle(player, dt);
+            case "dragon":
+                player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
+                player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
+                player.chance_move.set("dragon", 0);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                return DarkTowerStates.move_dragon(player, dt);
+            case "plague":
+                player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
+                player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
+                player.chance_move.set("plague", 0);
+                player.chance_move.set("cursed", player.chance_move.get("cursed")+0.15);
+                return DarkTowerStates.move_plague(player, dt);
+            case "cursed":
+                player.chance_move.set("safe", player.chance_move.get("safe")+0.25);
+                player.chance_move.set("battle", player.chance_move.get("battle")+0.25);
+                player.chance_move.set("lost", player.chance_move.get("lost")+0.15);
+                player.chance_move.set("dragon", player.chance_move.get("dragon")+0.15);
+                player.chance_move.set("plague", player.chance_move.get("plague")+0.15);
+                player.chance_move.set("cursed", 0);
+                return DarkTowerStates.move_cursed(player, dt);
+        }
+    }
+
+    static move_safe(player, dt) {
         return {
-            name: "move"
+            name: "move_safe",
+            audio: dt.media.audio.beep,
+            keys: "001000000000",
+            state: {
+                no: "endTurn"
+            }
+        };
+    }
+
+    static move_lost(player, dt) {
+        if (player.inventory.get("scout")) {
+            player.inventory.set("scout", false);
+            return {
+                name: "move_lost_scout",
+                img: dt.media.image.lost,
+                keys: "000000000000",
+                delay: 1500,
+                delayThen: {
+                    output: "00",
+                    img: dt.media.image.scout,
+                    keys: "001000000000",
+                    state: {
+                        no: "endTurn"
+                    }
+                }
+            };
+        }
+        return {
+            name: "move_lost",
+            img: dt.media.image.lost,
+            keys: "000000000000",
+            audio: dt.media.audio.lost,
+            audioThen: {
+                img: dt.media.image.lost,
+                keys: "001000000000",
+                state: {
+                    no: "endTurn"
+                }
+            }
+        };
+    }
+
+    static move_battle(player, dt) {
+        const { min, max } = DarkTowerStates.brigands.get("move");
+        dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
+        return DarkTowerStates.battle(player, dt);
+    }
+
+    static move_dragon(player, dt) {
+        if (player.inventory.get("sword")) {
+            player.inventory.set("sword", false);
+            return {
+                name: "move_dragon_sword",
+                keys: "000000000000",
+                img: dt.media.image.dragon,
+                audio: dt.media.audio.dragon_kill,
+                delay: 1500,
+                delayThen: {
+                    img: dt.media.image.sword,
+                    keys: "100000000000",
+                    state: {
+                        yes: "dragon_treasure"
+                    }
+                }
+            };
+        }
+        player.inventory.set("warriors", Math.ceil(player.inventory.get("warriors")/2));
+        const carry = Math.min(99, player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0));
+        player.inventory.set("gold", Math.min(carry, Math.floor(player.inventory.get("gold")/2)));
+        return {
+            name: "move_dragon",
+            keys: "000000000000",
+            img: dt.media.image.dragon,
+            audio: dt.media.audio.dragon,
+            audioThen: {
+                img: dt.media.image.dragon,
+                keys: "100000000000",
+                state: {
+                    yes: "move_dragon_warriors"
+                }
+            }
+        };
+    }
+
+    static move_dragon_warriors(player, dt) {
+        return {
+            name: "move_dragon_warriors",
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
+            img: dt.media.image.warriors,
+            keys: "000000000001",
+            state: {
+                inventory: "move_dragon_gold"
+            }
+        };
+    }
+
+    static move_dragon_gold(player, dt) {
+        return {
+            name: "move_dragon_gold",
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            keys: "011000000000",
+            state: {
+                repeat: "move_dragon_warriors",
+                no: "endTurn"
+            }
+        };
+    }
+
+    static move_plague(player, dt) {
+        if (player.inventory.get("healer")) {
+            player.inventory.set("healer", false);
+            const newWarriors = Math.floor(Math.random() * 5) + 2;
+            player.inventory.set("warriors", player.inventory.get("warriors") + newWarriors);
+            return {
+                name: "move_plague_healer",
+                keys: "000000000000",
+                img: dt.media.image.plague,
+                delay: 1500,
+                delayThen: {
+                    img: dt.media.image.healer,
+                    keys: "100000000000",
+                    state: {
+                        yes: "move_plague_warriors"
+                    }
+                }
+            };
+        }
+        player.inventory.set("warriors", Math.ceil(player.inventory.get("warriors")/2));
+        const carry = Math.min(99, player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0));
+        player.inventory.set("gold", Math.min(carry, player.inventory.get("gold")));
+        return {
+            name: "move_plague",
+            keys: "000000000000",
+            img: dt.media.image.plague,
+            audio: dt.media.audio.plague,
+            audioThen: {
+                img: dt.media.image.plague,
+                keys: "100000000000",
+                state: {
+                    yes: "move_plague_warriors"
+                }
+            }
+        };
+    }
+
+    static move_plague_warriors(player, dt) {
+        return {
+            name: "move_plague_warriors",
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
+            img: dt.media.image.warriors,
+            keys: "000000000001",
+            state: {
+                inventory: "move_plague_gold"
+            }
+        };
+    }
+
+    static move_plague_gold(player, dt) {
+        return {
+            name: "move_plague_gold",
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            keys: "011000000000",
+            state: {
+                repeat: "move_plague_warriors",
+                no: "endTurn"
+            }
+        };
+    }
+
+    static move_cursed(player, dt) {
+        if (player.inventory.get("wizard")) {
+            player.inventory.set("wizard", false);
+            return {
+                name: "move_cursed_wizard",
+                keys: "000000000000",
+                img: dt.media.image.cursed,
+                delay: 1500,
+                delayThen: {
+                    img: dt.media.image.wizard,
+                    keys: "001000000000",
+                    state: {
+                        no: "endTurn"
+                    }
+                }
+            };
+        }
+        player.inventory.set("warriors", Math.ceil(player.inventory.get("warriors")/2));
+        const carry = Math.min(99, player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0));
+        player.inventory.set("gold", Math.min(carry, Math.floor(player.inventory.get("gold")/2)));
+        return {
+            name: "move_cursed",
+            keys: "000000000000",
+            img: dt.media.image.cursed,
+            audio: dt.media.audio.cursed,
+            audioThen: {
+                img: dt.media.image.cursed,
+                keys: "100000000000",
+                state: {
+                    yes: "move_cursed_warriors"
+                }
+            }
+        };
+    }
+
+    static move_cursed_warriors(player, dt) {
+        return {
+            name: "move_cursed_warriors",
+            output: player.inventory.get("warriors").toString().padStart(2, "0"),
+            img: dt.media.image.warriors,
+            keys: "000000000001",
+            state: {
+                inventory: "move_cursed_gold"
+            }
+        };
+    }
+
+    static move_cursed_gold(player, dt) {
+        return {
+            name: "move_cursed_gold",
+            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            img: dt.media.image.gold,
+            keys: "011000000000",
+            state: {
+                repeat: "move_cursed_warriors",
+                no: "endTurn"
+            }
         };
     }
 
@@ -474,7 +768,8 @@ class DarkTowerStates {
         }
         if (gold <= 7) {
             gold += Math.floor(Math.random() * 10) + 5;
-            player.inventory.set("gold", gold);
+            const carry = player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0);
+            player.inventory.set("gold", Math.min(carry, gold));
         }
         return {
             name: "sanctuary",
@@ -491,10 +786,9 @@ class DarkTowerStates {
             name: "sanctuary_warriors",            
             output: player.inventory.get("warriors").toString().padStart(2, "0"),
             img: dt.media.image.warriors,
-            keys: "101000000000",
+            keys: "000000000001",
             state: {
-                yes: "sanctuary_food",
-                no: "endTurn"
+                inventory: "sanctuary_food"
             }
         };
     }
@@ -504,11 +798,10 @@ class DarkTowerStates {
             name: "sanctuary_food",
             output: player.inventory.get("food").toString().padStart(2, "0"),
             img: dt.media.image.food,
-            keys: "111000000000",
+            keys: "010000000001",
             state: {
-                yes: "sanctuary_gold",
-                repeat: "sanctuary_warriors",
-                no: "endTurn"
+                inventory: "sanctuary_gold",
+                repeat: "sanctuary_warriors"
             }
         };
     }
@@ -1038,9 +1331,10 @@ class DarkTowerStates {
             dt.brigands = Math.floor(dt.brigands/2);
         }
         else {
-            player.inventory.set("warriors", warriors-1);
+            player.inventory.set("warriors", Math.max(1, warriors-1));
+            const carry = player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0);
+            player.inventory.set("gold", Math.min(carry, player.inventory.get("gold")));
             if (player.inventory.get("warriors") <= 0) {
-                player.inventory.set("warriors", 1);
                 return DarkTowerStates.battle_escape(player, dt);
             }
             audio = dt.media.audio.player_hit;
@@ -1129,9 +1423,9 @@ class DarkTowerStates {
             audio: dt.media.audio.beep,
             output: player.inventory.get("gold").toString().padStart(2, "0"),
             img: dt.media.image.gold,
-            keys: "100000000000",
+            keys: "000000000001",
             state: {
-                yes: `tomb_treasure_${lagniappe}`
+                inventory: `tomb_treasure_${lagniappe}`
             }
         };
     }
@@ -1241,6 +1535,8 @@ class DarkTowerStates {
             }
         };
     }
+
+    static dragon_treasure(player, dt) {}
 }
 
 const darkTowerGame = new DarkTowerGame();
