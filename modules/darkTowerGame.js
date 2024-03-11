@@ -221,68 +221,68 @@ class DarkTowerStates {
         return {
             output: dt.bazaar.warriors.toString().padStart(2, "0"),
             img: dt.media.image.warrior,
-            keys: "100101000000",
+            keys: "100110000000",
             state: {
                 yes: "bazaar_buy",
                 haggle: "bazaar_haggle",
-                clear: "bazaar_food"
+                bazaar: "bazaar_food"
             }
         };
     }
 
     static bazaar_food(player, dt) {
         dt.bazaar_item = "food";
-        let clear;
-        if (dt.bazaar.beast) clear = "bazaar_beast";
-        else if (dt.bazaar.scout) clear = "bazaar_scout";
-        else if (dt.bazaar.healer) clear = "bazaar_healer";
-        else clear = "bazaar_warriors";
+        let bazaar;
+        if (dt.bazaar.beast) bazaar = "bazaar_beast";
+        else if (dt.bazaar.scout) bazaar = "bazaar_scout";
+        else if (dt.bazaar.healer) bazaar = "bazaar_healer";
+        else bazaar = "bazaar_warriors";
         return {
             output: dt.bazaar.food.toString().padStart(2, "0"),
             img: dt.media.image.food,
-            keys: "110101000000",
+            keys: "110110000000",
             state: {
                 yes: "bazaar_buy",
                 repeat: "bazaar_warriors",
                 haggle: "bazaar_haggle",
-                clear
+                bazaar
             }
         };
     }
 
     static bazaar_beast(player, dt) {
         dt.bazaar_item = "beast";
-        let clear;
-        if (dt.bazaar.scout) clear = "bazaar_scout";
-        else if (dt.bazaar.healer) clear = "bazaar_healer";
-        else clear = "bazaar_warriors";
+        let bazaar;
+        if (dt.bazaar.scout) bazaar = "bazaar_scout";
+        else if (dt.bazaar.healer) bazaar = "bazaar_healer";
+        else bazaar = "bazaar_warriors";
         return {
             output: dt.bazaar.beast.toString().padStart(2, "0"),
             img: dt.media.image.beast,
-            keys: "110101000000",
+            keys: "110110000000",
             state: {
                 yes: "bazaar_sale",
                 repeat: "bazaar_warriors",
                 haggle: "bazaar_haggle",
-                clear
+                bazaar
             }
         };
     }
 
     static bazaar_scout(player, dt) {
         dt.bazaar_item = "scout";
-        let clear;
-        if (dt.bazaar.healer) clear = "bazaar_healer";
-        else clear = "bazaar_warriors";
+        let bazaar;
+        if (dt.bazaar.healer) bazaar = "bazaar_healer";
+        else bazaar = "bazaar_warriors";
         return {
             output: dt.bazaar.scout.toString().padStart(2, "0"),
             img: dt.media.image.scout,
-            keys: "110101000000",
+            keys: "110110000000",
             state: {
                 yes: "bazaar_sale",
                 repeat: "bazaar_warriors",
                 haggle: "bazaar_haggle",
-                clear
+                bazaar
             }
         };
     }
@@ -292,12 +292,12 @@ class DarkTowerStates {
         return {
             output: dt.bazaar.healer.toString().padStart(2, "0"),
             img: dt.media.image.healer,
-            keys: "110101000000",
+            keys: "110110000000",
             state: {
                 yes: "bazaar_sale",
                 repeat: "bazaar_warriors",
                 haggle: "bazaar_haggle",
-                clear: "bazaar_warriors"
+                bazaar: "bazaar_warriors"
             }
         };
     }
