@@ -29,6 +29,38 @@ class DarkTowerGame {
     }
 };
 
+class DarkTowerSettings {
+    static eat = new Map([
+        [[1,15], 1],
+        [[16,30], 2],
+        [[31,45], 3],
+        [[46,60], 4],
+        [[61,75], 5],
+        [[76,90], 6],
+        [[91,99], 7]
+    ]);
+
+    static price = new Map([
+        ["warriors", { min: 4, max: 10 }],
+        ["food", { min: 1, max: 1 }],
+        ["beast", { min: 15, max: 20 }],
+        ["scout", { min: 15, max: 20 }],
+        ["healer", { min: 15, max: 20 }]
+    ]);
+
+    static brigands = new Map([
+        ["move", { min: 5, max: 15}],
+        ["tomb", { min: 15, max: 30}],
+        ["darkTower", { min: 30, max: 50}]
+    ]);
+
+    static gold = new Map([
+        ["move", { min: 15, max: 30 }],
+        ["tomb", { min: 25, max: 40 }],
+        ["dragon", { min: 30, max: 50 }]
+    ]);
+}
+
 class DarkTowerPlayer {
     constructor(name) {
         this.name = name;
@@ -68,43 +100,50 @@ class DarkTowerPlayer {
         this.frontier = 0;
         this.turnState = [];
     }
+
+    eat() {
+
+    }
+
+    canEat() {
+
+    }
+
+    get carry() {
+        return Math.min(99, this.inventory.get("warriors") * 6 + (this.inventory.get("beast")?50:0));
+    }
+
+    get warriors() {
+        return this.inventory.get("warriors");
+    }
+    set warriors(w) {
+        this.inventory.set("warriors", w);
+        const carry = this.carry;
+        const gold = this.gold;
+        this.inventory.set("gold", Math.min(carry, gold));
+    }
+
+    get gold() {
+        return this.inventory.get("gold");
+    }
+    set gold(g) {
+        this.inventory.set("gold", g);
+    }
+
+    get food() {
+        return this.inventory.get("food");
+    }
+    set food(f) {
+        this.inventory.set("food", f);
+    }
 }
 
 class DarkTowerStates {
-    static eat = new Map([
-        [[1,15], 1],
-        [[16,30], 2],
-        [[31,45], 3],
-        [[46,60], 4],
-        [[61,75], 5],
-        [[76,90], 6],
-        [[91,99], 7]
-    ]);
-
-    static price = new Map([
-        ["warriors", { min: 4, max: 10 }],
-        ["food", { min: 1, max: 1 }],
-        ["beast", { min: 15, max: 20 }],
-        ["scout", { min: 15, max: 20 }],
-        ["healer", { min: 15, max: 20 }]
-    ]);
-
-    static brigands = new Map([
-        ["move", { min: 5, max: 15}],
-        ["tomb", { min: 15, max: 30}],
-        ["darkTower", { min: 30, max: 50}]
-    ]);
-
-    static gold = new Map([
-        ["move", { min: 15, max: 30 }],
-        ["tomb", { min: 25, max: 40 }],
-        ["dragon", { min: 30, max: 50 }]
-    ]);
 
     static start(player, dt) {
         let [ warriors, food, gold ] = ["warriors", "food", "gold"].map(i => player.inventory.get(i));
         let toEat;
-        DarkTowerStates.eat.forEach((v,k) => {
+        DarkTowerSettings.eat.forEach((v,k) => {
             if (warriors >= k[0] && warriors <= k[1]) toEat = v;
         });
         food -= toEat;
@@ -206,8 +245,8 @@ class DarkTowerStates {
 
     static bazaar(player, dt) {
         player.location = "bazaar";
-        const warriors_price = DarkTowerStates.price.get("warriors");
-        const food_price = DarkTowerStates.price.get("food");
+        const warriors_price = DarkTowerSettings.price.get("warriors");
+        const food_price = DarkTowerSettings.price.get("food");
         dt.bazaar = {
             warriors: Math.floor(Math.random() * (warriors_price.max - warriors_price.min +1)) + warriors_price.min,
             food: Math.floor(Math.random() * (food_price.max - food_price.min +1)) + food_price.min
@@ -216,7 +255,7 @@ class DarkTowerStates {
         const rand = Math.floor(Math.random() * (extras.length + 1));
         if (rand < extras.length) {
             const item = extras[rand];
-            const item_price = DarkTowerStates.price.get(item);
+            const item_price = DarkTowerSettings.price.get(item);
             dt.bazaar[item] = Math.floor(Math.random() * (item_price.max - item_price.min +1)) + item_price.min;
         }
         return {
@@ -361,7 +400,7 @@ class DarkTowerStates {
 
     static bazaar_haggle(player, dt) {
         const item = dt.bazaar_item;
-        const price = DarkTowerStates.price.get(item);
+        const price = DarkTowerSettings.price.get(item);
         const chance = (dt.bazaar[item] - price.min) / (price.max - price.min);
         if (Math.random() < chance) {
             dt.bazaar[item]--;
@@ -446,7 +485,7 @@ class DarkTowerStates {
     }
 
     static tomb_battle(player, dt) {
-        const { min, max } = DarkTowerStates.brigands.get("tomb");
+        const { min, max } = DarkTowerSettings.brigands.get("tomb");
         dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
         return DarkTowerStates.battle(player, dt);
     }
@@ -563,7 +602,7 @@ class DarkTowerStates {
     }
 
     static move_battle(player, dt) {
-        const { min, max } = DarkTowerStates.brigands.get("move");
+        const { min, max } = DarkTowerSettings.brigands.get("move");
         dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
         return DarkTowerStates.battle(player, dt);
     }
@@ -935,7 +974,7 @@ class DarkTowerStates {
     }
 
     static darkTower_battle(player, dt) {
-        const { min, max } = DarkTowerStates.brigands.get("darkTower");
+        const { min, max } = DarkTowerSettings.brigands.get("darkTower");
         dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
         return DarkTowerStates.battle(player, dt);
     }
@@ -1375,7 +1414,7 @@ class DarkTowerStates {
 
     static tomb_treasure(player, dt) {
         //gold
-        const { min, max } = DarkTowerStates.gold.get("tomb");
+        const { min, max } = DarkTowerSettings.gold.get("tomb");
         const gold = Math.ceil(Math.random() * (max - min +1)) + min;
         const newGold = Math.min(
             Math.min(player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0), 99),
@@ -1520,7 +1559,7 @@ class DarkTowerStates {
     }
 
     static move_treasure(player, dt) {
-        const { min, max } = DarkTowerStates.gold.get("move");
+        const { min, max } = DarkTowerSettings.gold.get("move");
         const gold = Math.ceil(Math.random() * (max - min +1)) + min;
         const newGold = Math.min(
             Math.min(player.inventory.get("warriors")*6 + (player.inventory.get("beast")?50:0), 99),
