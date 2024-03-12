@@ -6,6 +6,12 @@ export default class DarkTowerSettings {
         ["gold", 30]
     ]);
 
+    static carryMax = new Map([
+        ["warriors", 99],
+        ["food", 99],
+        ["gold", 99]
+    ]);
+
     static eat = new Map([
         [[1,15], 1],
         [[16,30], 2],

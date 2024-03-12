@@ -68,22 +68,30 @@ export default class DarkTowerPlayer {
     }
 
     get carry() {
-        return Math.min(99, this.inventory.get("warriors") * 6 + (this.inventory.get("beast")?50:0));
+        return Math.min(
+            DarkTowerSettings.carryMax.get("gold"), 
+            this.inventory.get("warriors") * 6 + (this.inventory.get("beast")?50:0)
+        );
     }
 
     get warriors() { return this.inventory.get("warriors"); }
     set warriors(w) {
-        this.inventory.set("warriors", w);
-        const carry = this.carry;
-        const gold = this.gold;
+        this.inventory.set("warriors", Math.min(
+            DarkTowerSettings.carryMax.get("warriors"),
+            Math.max(1, w)
+        ));
+        const { carry, gold } = this;
         this.inventory.set("gold", Math.min(carry, gold));
     }
 
     get gold() { return this.inventory.get("gold"); }
-    set gold(g) { this.inventory.set("gold", g); }
+    set gold(g) { this.inventory.set("gold", Math.min(this.carry, Math.max(0, g))); }
 
     get food() { return this.inventory.get("food"); }
-    set food(f) { this.inventory.set("food", f); }
+    set food(f) { this.inventory.set("food", Math.min(
+        DarkTowerSettings.carryMax.get("food"),
+        Math.max(0, f)
+    )); }
 
     get beast() { return this.inventory.get("beast"); }
     set beast(b) { this.inventory.set("beast", b); }

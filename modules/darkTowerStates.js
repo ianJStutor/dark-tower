@@ -12,16 +12,18 @@ export default class DarkTowerStates {
     }
 
     static foodWarning(player, dt) {
+        const output = player.food.toString().padStart(2, "0");
+        const img = dt.media.image.food;
         return {
             name: "foodWarning",
-            output: player.inventory.get("food").toString().padStart(2, "0"),
-            img: dt.media.image.food,
+            output,
+            img,
             keys: "000000000000",
             audio: dt.media.audio.starving,
             audioThen: {
                 keys: "000001000000",
-                output: player.inventory.get("food").toString().padStart(2, "0"),
-                img: dt.media.image.food,
+                output,
+                img,
                 state: {
                     clear: "menu"
                 }
@@ -30,15 +32,17 @@ export default class DarkTowerStates {
     }
 
     static starve_food(player, dt) {
+        const output = player.food.toString().padStart(2, "0");
+        const img = dt.media.image.food;
         return {
             name: "starve_food",
-            output: player.inventory.get("food").toString().padStart(2, "0"),
-            img: dt.media.image.food,
+            output,
+            img,
             audio: dt.media.audio.plague,
             keys: "000000000000",
             audioThen: {
-                output: player.inventory.get("food").toString().padStart(2, "0"),
-                img: dt.media.image.food,
+                output,
+                img,
                 keys: "000001000001",
                 state: {
                     inventory: "starve_warriors",
@@ -51,7 +55,7 @@ export default class DarkTowerStates {
     static starve_warriors(player, dt) {
         return {
             name: "starve_warriors",
-            output: player.inventory.get("warriors").toString().padStart(2, "0"),
+            output: player.warriors.toString().padStart(2, "0"),
             img: dt.media.image.warriors,
             keys: "010001000001",
             state: {
@@ -65,7 +69,7 @@ export default class DarkTowerStates {
     static starve_gold(player, dt) {
         return {
             name: "starve_gold",
-            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            output: player.gold.toString().padStart(2, "0"),
             img: dt.media.image.gold,
             keys: "010001000000",
             state: {
@@ -886,7 +890,7 @@ export default class DarkTowerStates {
         return {
             name: "inventory_warriors",
             keys: "000001000001",
-            output: player.inventory.get("warriors").toString().padStart(2, "0"),
+            output: player.warriors.toString().padStart(2, "0"),
             img: dt.media.image.warriors,
             state: {
                 inventory: "inventory_gold",
@@ -899,7 +903,7 @@ export default class DarkTowerStates {
         return {
             name: "inventory_gold",
             keys: "010001000001",
-            output: player.inventory.get("gold").toString().padStart(2, "0"),
+            output: player.gold.toString().padStart(2, "0"),
             img: dt.media.image.gold,
             state: {
                 inventory: "inventory_food",
@@ -934,7 +938,7 @@ export default class DarkTowerStates {
         return {
             name: "inventory_food",
             keys,
-            output: player.inventory.get("food").toString().padStart(2, "0"),
+            output: player.food.toString().padStart(2, "0"),
             img: dt.media.image.food,
             state
         };
@@ -954,7 +958,7 @@ export default class DarkTowerStates {
             "brassKey",
             "silverKey",
             "goldKey"
-        ].find(item => Boolean(player.inventory.get(item)));
+        ].find(item => Boolean(player[item]));
         if (yes) {
             state.inventory = `inventory_${yes}`;
         }
@@ -983,7 +987,7 @@ export default class DarkTowerStates {
             "brassKey",
             "silverKey",
             "goldKey"
-        ].find(item => Boolean(player.inventory.get(item)));
+        ].find(item => Boolean(player[item]));
         if (yes) {
             state.inventory = `inventory_${yes}`;
         }
@@ -1011,7 +1015,7 @@ export default class DarkTowerStates {
             "brassKey",
             "silverKey",
             "goldKey"
-        ].find(item => Boolean(player.inventory.get(item)));
+        ].find(item => Boolean(player[item]));
         if (yes) {
             state.inventory = `inventory_${yes}`;
         }
@@ -1038,7 +1042,7 @@ export default class DarkTowerStates {
             "brassKey",
             "silverKey",
             "goldKey"
-        ].find(item => Boolean(player.inventory.get(item)));
+        ].find(item => Boolean(player[item]));
         if (yes) {
             state.inventory = `inventory_${yes}`;
         }
@@ -1064,7 +1068,7 @@ export default class DarkTowerStates {
             "brassKey",
             "silverKey",
             "goldKey"
-        ].find(item => Boolean(player.inventory.get(item)));
+        ].find(item => Boolean(player[item]));
         if (yes) {
             state.inventory = `inventory_${yes}`;
         }
@@ -1089,7 +1093,7 @@ export default class DarkTowerStates {
         let yes = [
             "silverKey",
             "goldKey"
-        ].find(item => Boolean(player.inventory.get(item)));
+        ].find(item => Boolean(player[item]));
         if (yes) {
             state.inventory = `inventory_${yes}`;
         }
@@ -1113,7 +1117,7 @@ export default class DarkTowerStates {
         };
         let yes = [
             "goldKey"
-        ].find(item => Boolean(player.inventory.get(item)));
+        ].find(item => Boolean(player[item]));
         if (yes) {
             state.inventory = `inventory_${yes}`;
         }
