@@ -11,44 +11,7 @@ class DarkTowerGame {
     error() {}
 
     setupGame() {
-        this.players = this.playerNames.map(name => ({
-            name,
-            inventory: new Map([
-                ["gold", 30],
-                ["food", 26],
-                ["warriors", 10],
-                ["beast", false],
-                ["scout", false],
-                ["healer", false],
-                ["sword", false],
-                ["wizard", false],
-                ["brassKey", false],
-                ["silverKey", false],
-                ["goldKey", false]
-            ]),
-            chance_move: new Map([
-                ["safe", 1],
-                ["battle", 2],
-                ["dragon", 0],
-                ["plague", 0],
-                ["cursed", 0],
-                ["lost", 0.5]
-            ]),
-            chance_tomb: new Map([
-                ["empty", 0.5],
-                ["battle", 2],
-                ["treasure", 0]
-            ]),
-            chance_treasure: new Map([
-                ["nothing", 1],
-                ["key", 0],
-                ["sword", 0],
-                ["wizard", 0],
-                ["pegasus", 0]
-            ]),
-            frontier: 0,
-            turnState: []
-        }));
+        this.players = this.playerNames.map(name => new DarkTowerPlayer(name));
         this.currentPlayer = 0;
     }
     resetGame() {
@@ -65,6 +28,47 @@ class DarkTowerGame {
         this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
     }
 };
+
+class DarkTowerPlayer {
+    constructor(name) {
+        this.name = name;
+        this.inventory = new Map([
+            ["gold", 30],
+            ["food", 26],
+            ["warriors", 10],
+            ["beast", false],
+            ["scout", false],
+            ["healer", false],
+            ["sword", false],
+            ["wizard", false],
+            ["brassKey", false],
+            ["silverKey", false],
+            ["goldKey", false]
+        ]);
+        this.chance_move = new Map([
+            ["safe", 1],
+            ["battle", 2],
+            ["dragon", 0],
+            ["plague", 0],
+            ["cursed", 0],
+            ["lost", 0.5]
+        ]);
+        this.chance_tomb = new Map([
+            ["empty", 0.5],
+            ["battle", 2],
+            ["treasure", 0]
+        ]);
+        this.chance_treasure = new Map([
+            ["nothing", 1],
+            ["key", 0],
+            ["sword", 0],
+            ["wizard", 0],
+            ["pegasus", 0]
+        ]);
+        this.frontier = 0;
+        this.turnState = [];
+    }
+}
 
 class DarkTowerStates {
     static eat = new Map([
