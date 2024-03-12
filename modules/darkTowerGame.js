@@ -528,7 +528,6 @@ class DarkTowerStates {
 
     static move_lost(player, dt) {
         if (player.inventory.get("scout")) {
-            player.inventory.set("scout", false);
             return {
                 name: "move_lost_scout",
                 img: dt.media.image.lost,
@@ -628,7 +627,6 @@ class DarkTowerStates {
 
     static move_plague(player, dt) {
         if (player.inventory.get("healer")) {
-            player.inventory.set("healer", false);
             const newWarriors = Math.floor(Math.random() * 5) + 2;
             player.inventory.set("warriors", player.inventory.get("warriors") + newWarriors);
             return {

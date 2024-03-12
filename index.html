@@ -350,14 +350,12 @@
                     if (turn.name === "battle_escape") {
                         if (timer) clearTimeout(timer);
                         Object.values(dt.media.audio).forEach(audio => {
-                            if (!audio.paused) {
-                                try {
-                                    audio.pause();
-                                    audio.currentTime = 0;
-                                    audio.onended = null;
-                                }
-                                catch(e) { console.error(e); }
+                            try {
+                                audio.pause();
+                                audio.currentTime = 0;
+                                audio.onended = null;
                             }
+                            catch(e) { console.error(e); }
                         });
                     }
                     if (turn.output) output.textContent = turn.output;
