@@ -1,6 +1,7 @@
 import DarkTowerSettings from "./darkTowerSettings.js";
 
 export default class DarkTowerPlayer {
+    #frontier = 0;
     constructor(name) {
         this.name = name;
         this.inventory = new Map([
@@ -27,7 +28,7 @@ export default class DarkTowerPlayer {
         this.chance_tomb = new Map([
             ["empty", 0.5],
             ["battle", 2],
-            ["treasure", 0]
+            ["empty_treasure", 0]
         ]);
         this.chance_treasure = new Map([
             ["nothing", 1],
@@ -36,10 +37,27 @@ export default class DarkTowerPlayer {
             ["wizard", 0],
             ["pegasus", 0]
         ]);
-        this.frontier = 0;
         this.turnState = [];
+        this.location = "move";
     }
-
+    event(which) {
+        const ret = {};
+        const map = this[`chance_${which}`];
+        if (map) {
+            const sum = [...map.values()].reduce((a,b) => a+b, 0);
+            map.forEach((v,k) => ret[k] = v/sum);
+        }
+        let rand = Math.random();
+        let event;
+        for (let key in ret) {
+            if (rand < ret[key]) {
+                event = key;
+                break;
+            }
+            rand -= ret[key];
+        }
+        return event;
+    }
     eat() {
         let status = "ok";
         let { warriors, food } = this;        
@@ -74,18 +92,169 @@ export default class DarkTowerPlayer {
         );
     }
 
+    get move() {
+        this.location = "move";
+        let event = this.event("move");
+        this.chance_move.forEach((v,k) => {
+            if (k === event) switch (k) {
+                case "safe": this.chance_move.set("safe", 0.5); break;
+                case "battle": this.chance_move.set("battle", 0.75); break;
+                case "lost": this.chance_move.set("lost", 0.01); break;
+                case "dragon":
+                case "plague":
+                case "cursed": this.chance_move.set(k, 0); break;
+            }
+            else switch (k) {
+                case "safe":
+                case "battle": this.chance_move.set(k, this.chance_move.get(k) + 0.25); break;
+                case "lost": this.chance_move.set(k, this.chance_move.get(k) + 0.1); break;
+                case "plague": this.chance_move.set(k, this.chance_move.get(k) + 0.05); break; 
+                case "dragon": 
+                    if (this.chance_move.get(k) > 0) { //once per region
+                        this.chance_move.set(k, this.chance_move.get(k) + 0.05);
+                        break;
+                    }
+                case "cursed": 
+                    if (this.chance_move.get(k) > 0) { //once per region
+                        this.chance_move.set(k, this.chance_move.get(k) + 0.01);
+                        break;
+                    }
+            }
+        });
+        switch (event) {
+            case "lost": if (this.scout) event += "_scout"; break;
+            case "plague": if (this.healer) {
+                    event += "_healer";
+                    this.warriors = this.warriors + Math.floor(Math.random() * 5) + 2;
+                }
+                else {
+                    this.warriors = Math.ceil(this.warriors/2);
+                }    
+                break;
+            case "dragon": if (this.sword) {
+                    this.inventory.set("sword", false);
+                    event += "_sword";
+                }
+                else {
+                    this.gold = Math.floor(this.gold/2);
+                    this.warriors = Math.ceil(this.warriors/2);
+                }
+                break;
+            case "cursed": if (this.wizard) {
+                    this.inventory.set("wizard", false);
+                    event += "_wizard";
+                }
+                else {
+                    this.gold = Math.floor(this.gold/2);
+                    this.warriors = Math.ceil(this.warriors/2);
+                }
+                break;
+        }
+        return event;
+    }
+    get tomb() {
+        this.location = "tomb";
+        const event = this.event("tomb");
+        this.chance_tomb.forEach((v,k) => {
+            if (k === event) this.chance_tomb.set(k, 0.1);
+            else switch (k) {
+                case "empty": this.chance_tomb.set(k, v + 0.5); break;
+                case "empty_treasure": this.chance_tomb.set(k, v + 0.25); break;
+                case "battle": this.chance_tomb.set(k, v + 1); break;
+            }
+        });
+        return event;
+    }
+    get treasure() {
+        const nothing_chance = this.chance_treasure.get("nothing");
+        if (this.location !== "tomb") this.chance_treasure.set("nothing", 0); //dragon has loot!
+        const event = this.event("treasure");
+        this.chance_treasure.forEach((v,k) => {
+            if (k === event) switch(k) {
+                case "nothing": this.chance_treasure.set(k, 0.25); break;
+                case "key":
+                case "sword":
+                case "wizard":
+                case "pegasus": this.chance_treasure.set(k, 0); break;
+            }
+            else switch(k) {
+                case "nothing": this.chance_treasure.set(k, this.chance_treasure.get(k) + 0.5); break;
+                case "key": if (this.chance_treasure.get(k) > 0) {
+                        this.chance_treasure.set(k, this.chance_treasure.get(k) + 1);
+                        break;
+                    }
+                case "sword":
+                case "wizard":
+                case "pegasus": if (this.chance_treasure.get(k) > 0) {
+                        this.chance_treasure.set(k, this.chance_treasure.get(k) + 0.25);
+                        break;
+                    }
+            }
+        });
+        switch (event) {
+            case "key":
+                switch (this.#frontier) {
+                    case 1: this.brassKey = true; break;
+                    case 2: this.silverKey = true; break;
+                    case 3: this.goldKey = true; break;
+                }
+            case "sword":
+            case "wizard":
+            case "pegasus": this[event] = true;
+        }
+        if (this.location !== "tomb") this.chance_treasure.set("nothing", nothing_chance);
+        return event;
+    }
+    get bazaar() {
+        this.location = "bazaar";
+    }
+    get sanctuary() {
+        if (this.#frontier === 4 && this.brassKey && this.silverKey && this.goldKey && !this.location === "sanctuary") {
+            //home citadel, all keys
+            const warriors = this.warriors;
+            if (warriors >= 5 && warriors <= 24) this.warriors = warriors * 2;
+        }
+        this.location = "sanctuary";
+        if (this.warriors <= 4) this.warriors = this.warriors + Math.floor(Math.random() * 6) + 1;
+        if (this.food <= 5) this.food = this.food + Math.floor(Math.random() * 6) + 4;
+        if (this.gold <= 7) this.gold = this.gold + Math.floor(Math.random() * 10) + 5;
+    }
+    get frontier() { 
+        switch (this.#frontier) {
+            case 1: if (!this.brassKey) return "noKey"; break;
+            case 2: if (!this.silverKey) return "noKey"; break;
+            case 3: if (!this.goldKey) return "noKey"; break;
+            case 4: return "noKey";
+        };
+        this.location = "frontier";
+        this.#frontier++;
+        if (this.#frontier < 4) this.chance_treasure.set("key", 2);
+        ["sword", "wizard", "pegasus"].forEach(i => {
+            if (!this[i]) {
+                this.chance_treasure.set(i, this.chance_treasure.get(i) + 0.25);
+            }
+        });
+        this.chance_move.set("dragon", this.chance_move.get("dragon") + 0.05);
+        this.chance_move.set("plague", this.chance_move.get("plague") + 0.1);
+        this.chance_move.set("cursed", this.chance_move.get("cursed") + 0.01);
+        this.chance_move.set("lost", this.chance_move.get("lost") + 0.2);
+    }
+    get darkTower() {
+        if (!this.brassKey || !this.silverKey || !this.goldKey) return "noKey";
+        this.location = "darkTower";
+    }
+
     get warriors() { return this.inventory.get("warriors"); }
     set warriors(w) {
         this.inventory.set("warriors", Math.min(
             DarkTowerSettings.carryMax.get("warriors"),
             Math.max(1, w)
         ));
-        const { carry, gold } = this;
-        this.inventory.set("gold", Math.min(carry, gold));
+        this.gold = Math.min(this.carry, this.gold);
     }
 
     get gold() { return this.inventory.get("gold"); }
-    set gold(g) { this.inventory.set("gold", Math.min(this.carry, Math.max(0, g))); }
+    set gold(g) { this.inventory.set("gold", Math.max(0, Math.min(this.carry, Math.max(0, g)))); }
 
     get food() { return this.inventory.get("food"); }
     set food(f) { this.inventory.set("food", Math.min(
