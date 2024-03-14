@@ -369,6 +369,7 @@
                         await turn.audio.play();
                     }
                     if (turn.delayThen) {
+                        if (timer) clearTimeout(timer);
                         timer = setTimeout(() => takeTurn(turn.delayThen), turn.delay);
                     }
                     turn.player = player;

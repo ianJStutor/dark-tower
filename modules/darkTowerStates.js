@@ -1031,12 +1031,9 @@ export default class DarkTowerStates {
         return {
             name: "battle",
             keys: "000000000000",
-            audio: dt.media.audio.enemy_hit,
+            audio: dt.media.audio.battle,
             audioThen: {
-                audio: dt.media.audio.enemy_hit,
-                audioThen: {
-                    redirect: "battle_brigands"
-                }
+                redirect: "battle_brigands"
             }
         };
     }
@@ -1091,7 +1088,7 @@ export default class DarkTowerStates {
         let warriors = player.warriors;
         const winChance = warriors / (warriors + dt.brigands);
         let audio;
-        if (Math.random() < winChance) {
+        if (Math.random() <= winChance) {
             audio = dt.media.audio.enemy_hit;
             dt.brigands = Math.floor(dt.brigands/2);
         }
