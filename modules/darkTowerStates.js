@@ -348,11 +348,10 @@ export default class DarkTowerStates {
             keys: "000000000000",
             delay: 1500,
             delayThen: {
-                output: "00",
                 img: dt.media.image.scout,
-                keys: "001000000000",
+                keys: "000001000000",
                 state: {
-                    no: "endTurn"
+                    clear: "menu"
                 }
             }
         };
