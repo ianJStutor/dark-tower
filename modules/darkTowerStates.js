@@ -79,7 +79,8 @@ export default class DarkTowerStates {
         };
     }
 
-    static menu(player) {
+    static menu(player, dt) {
+        player.reset();
         return {
             name: "menu",
             keys: "000010111111",
@@ -1042,6 +1043,7 @@ export default class DarkTowerStates {
     }
 
     static battle_brigands(player, dt) {
+        if (player.battleStopped) return DarkTowerStates.battle_escape(player, dt);
         return {
             name: "battle_brigands",
             output: dt.brigands.toString().padStart(2, "0"),
@@ -1059,6 +1061,7 @@ export default class DarkTowerStates {
     }
 
     static battle_warriors(player, dt) {
+        if (player.battleStopped) return DarkTowerStates.battle_escape(player, dt);
         if (dt.brigands <= 0) {
             if (player.location === "darkTower") {
                 return DarkTowerStates.darkTower_victory(player, dt);
@@ -1085,6 +1088,7 @@ export default class DarkTowerStates {
     }
 
     static battle_result(player, dt) {
+        if (player.battleStopped) return DarkTowerStates.battle_escape(player, dt);
         let warriors = player.warriors;
         const winChance = warriors / (warriors + dt.brigands);
         let audio;
@@ -1111,6 +1115,7 @@ export default class DarkTowerStates {
     }
 
     static battle_escape(player, dt) {
+        player.stopBattle();
         return {
             name: "battle_escape",
             output: player.warriors.toString().padStart(2, "0"),

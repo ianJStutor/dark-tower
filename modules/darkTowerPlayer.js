@@ -58,6 +58,12 @@ export default class DarkTowerPlayer {
         }
         return event;
     }
+    reset() {
+        this.battleStopped = false;
+    }
+    stopBattle() {
+        this.battleStopped = true;
+    }
     eat() {
         let status = "ok";
         let { warriors, food } = this;        
