@@ -92,6 +92,15 @@ export default class DarkTowerPlayer {
         );
     }
 
+    get difficulty() {
+        let index;
+        if (this.goldKey) index = "goldKey";
+        else if (this.silverKey) index = "silverKey";
+        else if (this.brassKey) index = "brassKey";
+        else index = "noKey";
+        return DarkTowerSettings.difficulty.get(index);
+    }
+
     get move() {
         this.location = "move";
         let event = this.event("move");

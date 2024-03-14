@@ -36,6 +36,13 @@ export default class DarkTowerSettings {
         ["darkTower", { min: 30, max: 50}]
     ]);
 
+    static difficulty = new Map([
+        ["noKey", 0.75],
+        ["brassKey", 0.9],
+        ["silverKey", 1],
+        ["goldKey", 1.1]
+    ]);
+
     static gold = new Map([
         ["move", { min: 15, max: 30 }],
         ["tomb", { min: 25, max: 40 }],

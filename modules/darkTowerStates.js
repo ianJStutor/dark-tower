@@ -305,7 +305,7 @@ export default class DarkTowerStates {
 
     static tomb_battle(player, dt) {
         const { min, max } = DarkTowerSettings.brigands.get("tomb");
-        dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
+        dt.brigands = Math.ceil((Math.random() * (max - min +1) + min) * player.difficulty);
         return DarkTowerStates.battle(player, dt);
     }
 
@@ -359,7 +359,7 @@ export default class DarkTowerStates {
 
     static move_battle(player, dt) {
         const { min, max } = DarkTowerSettings.brigands.get("move");
-        dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
+        dt.brigands = Math.ceil((Math.random() * (max - min +1) + min) * player.difficulty);
         return DarkTowerStates.battle(player, dt);
     }
 
@@ -701,7 +701,7 @@ export default class DarkTowerStates {
 
     static darkTower_battle(player, dt) {
         const { min, max } = DarkTowerSettings.brigands.get("darkTower");
-        dt.brigands = Math.ceil(Math.random() * (max - min +1)) + min;
+        dt.brigands = Math.ceil((Math.random() * (max - min +1) + min) * player.difficulty);
         return DarkTowerStates.battle(player, dt);
     }
 
