@@ -37,10 +37,10 @@ export default class DarkTowerSettings {
     ]);
 
     static difficulty = new Map([
-        ["noKey", 0.75],
-        ["brassKey", 0.9],
+        ["noKey", 0.5],
+        ["brassKey", 0.75],
         ["silverKey", 1],
-        ["goldKey", 1.1]
+        ["goldKey", 1.25]
     ]);
 
     static gold = new Map([

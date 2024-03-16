@@ -171,10 +171,14 @@ export default class DarkTowerPlayer {
         this.location = "tomb";
         const event = this.event("tomb");
         this.chance_tomb.forEach((v,k) => {
-            if (k === event) this.chance_tomb.set(k, 0.1);
+            if (k === event) switch (k) {
+                case "battle": this.chance_tomb.set(k, 1); break;
+                case "empty": 
+                case "empty_treasure": this.chance_tomb.set(k, 0.1); break;
+            }
             else switch (k) {
-                case "empty": this.chance_tomb.set(k, v + 0.2); break;
-                case "empty_treasure": this.chance_tomb.set(k, v + 0.1); break;
+                case "empty": this.chance_tomb.set(k, v + 0.1); break;
+                case "empty_treasure": this.chance_tomb.set(k, v + 0.075); break;
                 case "battle": this.chance_tomb.set(k, v + 1); break;
             }
         });

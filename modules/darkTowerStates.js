@@ -1086,7 +1086,7 @@ export default class DarkTowerStates {
     static battle_result(player, dt) {
         if (player.battleStopped) return DarkTowerStates.battle_escape(player, dt);
         let warriors = player.warriors;
-        const winChance = warriors / (warriors + dt.brigands);
+        const winChance = Math.max(0.25, warriors / (warriors + dt.brigands));
         let audio;
         if (Math.random() <= winChance) {
             audio = dt.media.audio.enemy_hit;
