@@ -16,7 +16,7 @@ export default async function loadMedia(resources, callback, error) {
             media[type][name] = res;
         }))
     )
-    .then(() => callback?.())
+    .then(() => callback?.(media))
     .catch(err => error?.(err));
     return media;
 }
